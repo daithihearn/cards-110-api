@@ -2,6 +2,7 @@
 
 echo "
     Setting up the environment variables"
+export PORT=8080
 export MONGODB_URI=mongodb://mongodb:27017
 export MONGODB_DATABASE_NAME=cards-110
 export PASSWORD_ENCODER_SEED=password
