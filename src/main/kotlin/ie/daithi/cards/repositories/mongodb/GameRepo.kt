@@ -1,4 +1,4 @@
-package ie.daithi.cards.repositories
+package ie.daithi.cards.repositories.mongodb
 
 import ie.daithi.cards.enumeration.GameStatus
 import ie.daithi.cards.model.Game

@@ -1,16 +1,11 @@
 package ie.daithi.cards.web.controller
 
 import ie.daithi.cards.model.Game
-import ie.daithi.cards.model.PublishContent
-import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.service.GameService
-import ie.daithi.cards.web.exceptions.NotFoundException
 import ie.daithi.cards.web.model.CreateGame
-import ie.daithi.cards.web.model.enums.PublishContentType
 import io.swagger.annotations.*
 import org.apache.logging.log4j.LogManager
 import org.springframework.http.HttpStatus
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @RestController

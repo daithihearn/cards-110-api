@@ -1,4 +1,4 @@
-package ie.daithi.cards.repositories
+package ie.daithi.cards.repositories.mongodb
 
 import ie.daithi.cards.web.security.model.AppUser
 import org.springframework.data.mongodb.repository.MongoRepository

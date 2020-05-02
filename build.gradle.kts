@@ -63,6 +63,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
 
 	//Springfox
