@@ -7,8 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection="games")
 data class Game (
     @Id
-    var id: String? = null,
+    val id: String? = null,
     val name: String,
     var status: GameStatus,
-    val players: List<Player>
+    val players: List<Player>,
+    val completedRounds: List<Round> = emptyList()
 )

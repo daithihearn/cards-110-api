@@ -1,8 +1,9 @@
 package ie.daithi.cards.service
 
 import ie.daithi.cards.enumeration.Card
-import ie.daithi.cards.model.Deck
+import ie.daithi.cards.model.*
 import ie.daithi.cards.repositories.redis.DeckRepo
+import ie.daithi.cards.repositories.redis.RoundRepo
 import ie.daithi.cards.web.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
@@ -27,12 +28,20 @@ class DeckService(
 
     // Get the next card
     fun nextCard(gameId: String): Card {
-        val deckOpt = deckRepo.findById(gameId)
-        if (!deckOpt.isPresent) throw NotFoundException("Deck not found")
-        val deck = deckOpt.get()
+        val deck = getDeck(gameId)
         if (deck.cards.empty()) throw NotFoundException("No cards left")
         val card = deck.cards.pop()
         deckRepo.save(deck)
         return card
+    }
+
+    fun save(deck: Deck) {
+        deckRepo.save(deck)
+    }
+
+    fun getDeck(gameId: String): Deck {
+        val deckOpt = deckRepo.findById(gameId)
+        if (!deckOpt.isPresent) throw NotFoundException("Deck not found")
+        return deckOpt.get()
     }
 }

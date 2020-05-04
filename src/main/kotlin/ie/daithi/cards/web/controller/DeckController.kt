@@ -34,8 +34,7 @@ class DeckController(
             ApiResponse(code = 200, message = "Request successful"),
             ApiResponse(code = 502, message = "An error occurred when attempting to send email")
     )
-    fun put(@RequestParam deckId: String) {
+    fun shuffle(@RequestParam deckId: String) {
         deckService.shuffle(deckId)
     }
-
 }

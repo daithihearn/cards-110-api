@@ -1,6 +1,8 @@
 package ie.daithi.cards.web.model
 
+import ie.daithi.cards.model.Player
+
 data class Score(
-        val playerId: String,
-        val score: Float
+        val player: Player,
+        val score: Int
 )
