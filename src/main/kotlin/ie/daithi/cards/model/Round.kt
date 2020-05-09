@@ -1,8 +1,8 @@
 package ie.daithi.cards.model
 
+import ie.daithi.cards.enumeration.Card
 import ie.daithi.cards.enumeration.RoundStatus
 import ie.daithi.cards.enumeration.Suit
-import ie.daithi.cards.web.model.Score
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -10,12 +10,12 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Round(
         @Id
         val id: String,
-        var goer: Player? = null,
         var status: RoundStatus,
+        var goer: Player? = null,
+        var suit: Suit? = null,
+        var leadOut: Suit? = null,
         val dealer: Player,
         var currentPlayer: Player,
-        var hands: List<Hand>,
-        var suit: Suit? = null,
-        var cardNumber: Int = 0,
-        val scores: List<Score> = emptyList()
+        var currentHand: Map<String, Card> = emptyMap(),
+        var completedHands: List<Map<String, Card>> = emptyList()
 )

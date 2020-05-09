@@ -3,7 +3,7 @@ package ie.daithi.cards.web.security
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm.HMAC512
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import ie.daithi.cards.repositories.mongodb.AppUserRepo
+import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.web.exceptions.NotFoundException
 import ie.daithi.cards.web.security.exception.AuthenticationException
 import ie.daithi.cards.web.security.model.AppUser

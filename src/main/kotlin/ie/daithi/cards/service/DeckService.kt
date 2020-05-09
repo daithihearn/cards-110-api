@@ -2,8 +2,7 @@ package ie.daithi.cards.service
 
 import ie.daithi.cards.enumeration.Card
 import ie.daithi.cards.model.*
-import ie.daithi.cards.repositories.redis.DeckRepo
-import ie.daithi.cards.repositories.redis.RoundRepo
+import ie.daithi.cards.repositories.DeckRepo
 import ie.daithi.cards.web.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 import java.security.SecureRandom

@@ -1,7 +1,7 @@
 package ie.daithi.cards.service
 
 import ie.daithi.cards.model.Round
-import ie.daithi.cards.repositories.redis.RoundRepo
+import ie.daithi.cards.repositories.RoundRepo
 import ie.daithi.cards.web.exceptions.NotFoundException
 import org.springframework.stereotype.Service
 

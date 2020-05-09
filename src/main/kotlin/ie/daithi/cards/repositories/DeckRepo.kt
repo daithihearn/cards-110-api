@@ -1,4 +1,4 @@
-package ie.daithi.cards.repositories.redis
+package ie.daithi.cards.repositories
 
 import ie.daithi.cards.model.Deck
 import org.springframework.data.repository.CrudRepository

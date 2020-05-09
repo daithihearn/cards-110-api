@@ -1,6 +1,6 @@
 package ie.daithi.cards.service
 
-import ie.daithi.cards.repositories.mongodb.AppUserRepo
+import ie.daithi.cards.repositories.AppUserRepo
 import org.apache.logging.log4j.LogManager
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority

@@ -1,6 +1,8 @@
 package ie.daithi.cards.web.controller
 
+import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.service.AppUserService
+import ie.daithi.cards.web.exceptions.NotFoundException
 import io.swagger.annotations.*
 import org.apache.logging.log4j.LogManager
 import org.springframework.http.HttpStatus
@@ -12,7 +14,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/session")
 @Api(tags = ["Session"], description = "Endpoints for session info")
 class SessionController (
-        private val appUserService: AppUserService
+        private val appUserService: AppUserService,
+        private val appUserRepo: AppUserRepo
 ){
 
     @GetMapping("/isLoggedIn")
@@ -33,8 +36,22 @@ class SessionController (
             ApiResponse(code = 200, message = "Request successful")
     )
     @ResponseBody
-    fun name(): String? {
-        return appUserService.loadUserByUsername(SecurityContextHolder.getContext().authentication.name).username
+    fun name(): String {
+        return SecurityContextHolder.getContext().authentication.name
+    }
+
+    @GetMapping("/id")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ApiOperation(value = "Get my ID", notes = "Get logged in user's id")
+    @ApiResponses(
+            ApiResponse(code = 200, message = "Request successful")
+    )
+    @ResponseBody
+    fun id(): String {
+        val user = appUserRepo.findByUsernameIgnoreCase(SecurityContextHolder.getContext().authentication.name)?:
+            throw NotFoundException("User not found!")
+
+        return user.id!!
     }
 
     @GetMapping("/type")

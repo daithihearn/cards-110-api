@@ -3,8 +3,9 @@ package ie.daithi.cards.web.controller
 import ie.daithi.cards.enumeration.Card
 import ie.daithi.cards.enumeration.Suit
 import ie.daithi.cards.model.Game
+import ie.daithi.cards.model.Player
 import ie.daithi.cards.model.Round
-import ie.daithi.cards.repositories.mongodb.AppUserRepo
+import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.service.GameService
 import ie.daithi.cards.web.exceptions.NotFoundException
 import ie.daithi.cards.web.model.CreateGame
@@ -157,6 +158,20 @@ class GameController (
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
         val game = gameService.getByPlayerId(appUser.id!!)
         return gameService.chooseFromDummy(gameId = game.id!!, playerId = appUser.id!!, selectedCards = cards, trumps = trumps)
+    }
+
+    @GetMapping("/game")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ApiOperation(value = "Get me", notes = "Get me and my cards")
+    @ApiResponses(
+            ApiResponse(code = 200, message = "Request successful")
+    )
+    @ResponseBody
+    fun getGame(): Game {
+        val id = SecurityContextHolder.getContext().authentication.name
+        val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
+        val game = gameService.getByPlayerId(appUser.id!!)
+        return gameService.getGameForPlayer(gameId = game.id!!, playerId = appUser.id!!)
     }
 
     companion object {

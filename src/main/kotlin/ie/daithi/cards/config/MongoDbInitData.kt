@@ -1,6 +1,6 @@
 package ie.daithi.cards.config
 
-import ie.daithi.cards.repositories.mongodb.AppUserRepo
+import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.web.security.model.AppUser
 import ie.daithi.cards.web.security.model.Authority
 import org.apache.logging.log4j.LogManager

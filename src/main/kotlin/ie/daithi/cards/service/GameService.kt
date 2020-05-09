@@ -5,11 +5,10 @@ import ie.daithi.cards.enumeration.GameStatus
 import ie.daithi.cards.enumeration.RoundStatus
 import ie.daithi.cards.enumeration.Suit
 import ie.daithi.cards.model.Game
-import ie.daithi.cards.model.Hand
 import ie.daithi.cards.model.Player
 import ie.daithi.cards.model.Round
-import ie.daithi.cards.repositories.mongodb.AppUserRepo
-import ie.daithi.cards.repositories.mongodb.GameRepo
+import ie.daithi.cards.repositories.AppUserRepo
+import ie.daithi.cards.repositories.GameRepo
 import ie.daithi.cards.validation.EmailValidator
 import ie.daithi.cards.web.exceptions.InvalidEmailException
 import ie.daithi.cards.web.exceptions.InvalidOperationException
@@ -72,7 +71,7 @@ class GameService(
                 name = name,
                 players = users.map { Player(id = it.id!!, displayName = it.username!!) })
 
-        game = gameRepo.save(game)
+        game = save(game)
 
         logger.info("Game started successfully ${game.id}")
         return game
@@ -83,6 +82,10 @@ class GameService(
         if (!game.isPresent)
             throw NotFoundException("Game $id not found")
         return game.get()
+    }
+
+    fun save(game: Game): Game {
+        return gameRepo.save(game)
     }
 
     fun delete(id: String) {
@@ -105,14 +108,14 @@ class GameService(
         val game = get(id)
         if( game.status == GameStatus.ACTIVE) throw InvalidSatusException("Can only finish a game that is in STARTED state not ${game.status}")
         game.status = GameStatus.COMPLETED
-        gameRepo.save(game)
+        save(game)
     }
 
     fun cancel(id: String) {
         val game = get(id)
         if( game.status == GameStatus.CANCELLED) throw InvalidSatusException("Game is already in CANCELLED state")
         game.status = GameStatus.CANCELLED
-        gameRepo.save(game)
+        save(game)
     }
 
     // Deal a new round
@@ -121,20 +124,18 @@ class GameService(
         val game = get(gameId)
 
         // 2. Get Dealer
-        val lastRound = roundService.getOrNull(gameId)
-        val dealer = if (lastRound != null) lastRound.hands[0].player
-        else game.players[0]
+        val dealer = game.players[0]
 
         // 3. Shuffle
         deckService.shuffle(gameId = game.id!!)
 
         // 4. Order the hands. Dummy second last, dealer last
-        val hands = orderHands(dealer, game.players)
+        game.players = orderPlayersAtStartOfGame(dealer, game.players)
 
         // 5. Deal the cards
         val deck =  deckService.getDeck(game.id)
         for(x in 0 until 5) {
-            hands.forEach {
+            game.players.forEach {
                 it.cards = it.cards.plus(deck.cards.pop())
             }
         }
@@ -144,10 +145,10 @@ class GameService(
         val round = Round(id = game.id,
                 dealer = dealer,
                 status = RoundStatus.CALLING,
-                currentPlayer = hands[0].player,
-                hands = hands)
+                currentPlayer = game.players[0])
 
         roundService.save(round)
+        save(game)
 
         // 7. Return the round
         return round
@@ -164,52 +165,49 @@ class GameService(
         val round = roundService.get(game.id!!)
         if (round.status != RoundStatus.CALLING) throw InvalidOperationException("Can only call in the calling phase")
 
-        // 4. Get my hand
-        val myHand = round.hands.find { it.player.id == round.currentPlayer.id }
-        myHand?: throw NotFoundException("Can't find current player's hand")
+        // 4. Find myself
+        val me = game.players.find { it.id == round.currentPlayer.id }
+        me?: throw NotFoundException("Can't find current player")
 
         // 5. Check they are the next player
         if (round.currentPlayer.id != playerId) throw InvalidOperationException("It's not your go!")
 
         // 6. Check if call value is valid i.e. > all other calls
         if (call != 0) {
-            val currentCall = round.hands.maxBy { it.call }
-            currentCall?:throw Exception("This should never happen")
-            if (round.currentPlayer == round.dealer && call >= currentCall.call) myHand.call = call
-            else if (call > currentCall.call) myHand.call = call
-            else throw InvalidOperationException("Call must be higher than ${currentCall.call}")
+            val currentCaller = game.players.maxBy { it.call }
+            currentCaller?:throw Exception("This should never happen")
+            if (round.currentPlayer == round.dealer && call >= currentCaller.call) me.call = call
+            else if (call > currentCaller.call) me.call = call
+            else throw InvalidOperationException("Call must be higher than ${currentCaller.call}")
         }
 
         // 7. Set next player/round status
         if (call == 30) {
             round.status = RoundStatus.CALLED
-            round.goer = myHand.player
-            round.currentPlayer = myHand.player
+            round.goer = me
+            round.currentPlayer = me
         } else if (round.currentPlayer.id == round.dealer.id) {
-            val callingHand = round.hands.maxBy { it.call }
-            callingHand ?: throw Exception("This should never happen")
-            if (callingHand.call == 0) return deal(gameId)
+            val caller = game.players.maxBy { it.call }
+            caller ?: throw Exception("This should never happen")
+            if (caller.call == 0) return deal(gameId)
             round.status = RoundStatus.CALLED
-            if (myHand.call == callingHand.call) {
-                round.goer = myHand.player
-                round.currentPlayer = myHand.player
+            if (me.call == caller.call) {
+                round.goer = me
+                round.currentPlayer = me
             } else {
-                round.goer = callingHand.player
-                round.currentPlayer = callingHand.player
+                round.goer = caller
+                round.currentPlayer = caller
             }
 
         } else {
-            val myHandIndex = round.hands.indexOf(myHand)
-            var nextHand = round.hands[myHandIndex + 1]
-            if (nextHand.player.id == "dummy") nextHand = round.hands[myHandIndex + 2]
-            round.currentPlayer = nextHand.player
+            val myIndex = game.players.indexOf(me)
+            var nextPlayer = game.players[myIndex + 1]
+            if (nextPlayer.id == "dummy") nextPlayer = game.players[myIndex + 2]
+            round.currentPlayer = nextPlayer
         }
 
         // 8. Save round
         roundService.save(round)
-
-        // 9. Filter out other players cards for return
-        round.hands.forEach { if (it.player.id != myHand.player.id) it.cards = emptyList() }
 
         return round
     }
@@ -231,31 +229,29 @@ class GameService(
             throw InvalidOperationException("Player ($playerId) is not the goer and current player")
 
         // 5. Get my hand
-        val myHand = round.hands.find { it.player.id == round.currentPlayer.id }
-        myHand?: throw NotFoundException("Can't find current player's hand")
+        val me = game.players.find { it.id == round.currentPlayer.id }
+        me?: throw NotFoundException("Can't find current player")
 
         // 6. Get Dummy
-        val dummy = round.hands.find { it.player.id == "dummy" }
+        val dummy = game.players.find { it.id == "dummy" }
         dummy?: throw NotFoundException("Can't find dummy")
 
         // 5. Validate selected cards
         selectedCards.forEach {
-            if (!(myHand.cards.contains(it) || dummy.cards.contains(it)))
+            if (!(me.cards.contains(it) || dummy.cards.contains(it)))
                 throw InvalidOperationException("You can't select this card: $it")
         }
 
         // 6. Set new hand and remove the dummy
-        round.hands = round.hands.minus(dummy)
-        round.hands.forEach { if (it.player.id == playerId) it.cards = selectedCards }
+        game.players = game.players.minus(dummy)
+        game.players.forEach { if (it.id == playerId) it.cards = selectedCards }
         round.status = RoundStatus.BUYING
         round.currentPlayer = nextPlayer(game.players, round.dealer)
         round.suit = trumps
 
         // 7. Save round
         roundService.save(round)
-
-        // 8. Filter out other players cards for return
-        round.hands.forEach { if (it.player.id != myHand.player.id) it.cards = emptyList() }
+        save(game)
 
         return round
     }
@@ -276,13 +272,13 @@ class GameService(
         if(round.currentPlayer.id != playerId)
             throw InvalidOperationException("Player ($playerId) is not the current player")
 
-        // 5. Get my hand
-        val myHand = round.hands.find { it.player.id == round.currentPlayer.id }
-        myHand?: throw NotFoundException("Can't find current player's hand")
+        // 5. Get myself
+        val me = game.players.find { it.id == round.currentPlayer.id }
+        me?: throw NotFoundException("Can't find current player")
 
         // 6. Validate selected cards
         selectedCards.forEach {
-            if (!(myHand.cards.contains(it)))
+            if (!(me.cards.contains(it)))
                 throw InvalidOperationException("You can't select this card: $it")
         }
 
@@ -290,96 +286,198 @@ class GameService(
         val deck =  deckService.getDeck(game.id)
         var newCards = selectedCards
         for(x in 0 until 5 - selectedCards.size) newCards = newCards.plus(deck.cards.pop())
-        round.hands.forEach { if (it.player.id == playerId) it.cards = newCards }
+        game.players.forEach { if (it.id == playerId) it.cards = newCards }
         deckService.save(deck)
 
-        // 8. Set new hand
+        // 8. Set next player
         if (round.dealer.id == playerId) round.status = RoundStatus.PLAYING
         round.currentPlayer = if (round.dealer.id == playerId) nextPlayer(game.players, round.goer!!)
-        else nextPlayer(game.players, myHand.player)
+        else nextPlayer(game.players, me)
 
         // 9. Save round
         roundService.save(round)
-
-        // 10. Filter out other players cards for return
-        round.hands.forEach { if (it.player.id != myHand.player.id) it.cards = emptyList() }
+        save(game)
 
         return round
     }
 
-    fun playCard(gameId: String, playerId: String, card: Card): Round {
+    fun playCard(gameId: String, playerId: String, myCard: Card): Round {
         // 1. Get Game
         val game = get(gameId)
 
         // 2. Get Round
-        val round = roundService.get(game.id!!)
+        var round = roundService.get(game.id!!)
         if (round.status != RoundStatus.PLAYING) throw InvalidOperationException("Can only call in the playing phase")
 
         // 3. Validate player
         if(round.currentPlayer.id != playerId)
             throw InvalidOperationException("Player ($playerId) is not the current player")
 
-        // 4. Get my hand
-        val myHand = round.hands.find { it.player.id == round.currentPlayer.id }
-        myHand?: throw NotFoundException("Can't find current player's hand")
+        // 4. Get myself
+        val me = game.players.find { it.id == round.currentPlayer.id }
+        me?: throw NotFoundException("Can't find current player")
 
         // 5. Validate selected card
-        if (myHand.cards.isEmpty()) throw InvalidOperationException("You have no cards left")
-        if (!(myHand.cards.contains(card)))
-            throw InvalidOperationException("You can't select this card: $card")
+        if (me.cards.isEmpty()) throw InvalidOperationException("You have no cards left")
+        if (!(me.cards.contains(myCard)))
+            throw InvalidOperationException("You can't select this card: $myCard")
 
-        // TODO Need to check they are following suit
+        // 6. Check that they are collowing suit
+        if (round.leadOut == null)
+            round.leadOut = myCard.suit
+        else if (!isFollowing(round.suit!!, myCard, me.cards, round.currentHand, round.leadOut!!))
+            throw InvalidOperationException("Must follow suit!")
 
-        // 6. Play the card
-        round.hands.forEach {
-            if (it.player.id == playerId) {
-                it.played.plus(card)
-                it.cards.minus(card)
-            }
-        }
+        // 7. Play the card
+        executePlayCard(game.players, round, me, myCard)
 
-        // 7. Check if point is finished
-        val yetToPlay = round.hands.filter {
-            it.played.size < round.cardNumber
-        }
-        if (yetToPlay.isNotEmpty()) {
+        // 8. Check if current hand is finished
+        if (round.currentHand.size < game.players.size) {
             round.currentPlayer = nextPlayer(game.players, round.currentPlayer)
         } else {
-            if (round.cardNumber == 5) {
-                // TODO Need to persist scores
-//                calculateScores(round)
-                deal(gameId)
+            if (round.completedHands.size >= 4) {
+                // Calculate Scores
+                game.players = calculateScores(round.completedHands, round.suit!!, game.players)
+
+                // TODO Do better. Also need teams.
+                // Check if game is over
+                game.players.forEach {
+                    if (it.score > 110) throw Exception("Game over! ${it.displayName} has won")
+                }
+                round = deal(gameId)
             } else {
-                // TODO Need to check who won the round and then set them as the current player
-                round.cardNumber++
+                val handWinner = handWinner(round.currentHand, round.suit!!, game.players)
+                round.currentPlayer = handWinner.first
+                game.players = orderPlayers(handWinner.first, game.players)
+                round.completedHands = round.completedHands.plus(round.currentHand)
+                round.currentHand = emptyMap()
             }
         }
 
 
-        // 8. Save round
+        // 9. Save round
         roundService.save(round)
+        save(game)
 
-        // 9. Filter out other players cards for return
-        round.hands.forEach { if (it.player.id != myHand.player.id) it.cards = emptyList() }
         return round
     }
 
-    fun nextPlayer(players: List<Player>, previousPlayer: Player): Player {
-        return generateSequence { players }.flatten().elementAt(players.indexOf(previousPlayer) + 1)
+    fun getGameForPlayer(gameId: String, playerId: String): Game {
+        // 1. Get Game
+        val game = get(gameId)
+
+        // 2. Filter out other player's cards
+        game.players.forEach { if (it.id != playerId) it.cards = emptyList() }
+        return game
     }
 
-    fun orderHands(dealer: Player, players: List<Player>): List<Hand> {
-        var handStack = Stack<Hand>()
-        handStack.push(Hand(player = dealer))
-        handStack.push(Hand(player = Player("dummy","dummy")))
+    private fun calculateScores(playedHands: List<Map<String, Card>>, suit: Suit, players: List<Player>): List<Player> {
+        // 1. Find winner of each hand
+        var bestCard: Pair<Player, Card>? = null
+        var updatedPlayers = players
+
+        playedHands.forEach {
+            val winner = handWinner(it, suit, players)
+            updatedPlayers = updatePlayersScore(updatedPlayers, winner.first, 5)
+            bestCard = if (bestCard == null || winner.second.value > bestCard!!.second.value) winner
+            else bestCard
+        }
+
+        // 2. Add points for best card
+        bestCard ?: throw InvalidOperationException("No best card identified")
+        updatedPlayers = updatePlayersScore(updatedPlayers, bestCard!!.first, 5)
+
+        // 3. Add points for best card
+
+        return updatedPlayers
+    }
+
+    private fun updatePlayersScore(players: List<Player>, player: Player, points: Int): List<Player> {
+        var updatedPlayers = players
+        updatedPlayers.forEach {
+            if(it.id == player.id) it.score = it.score + points
+        }
+        return players
+    }
+
+    private fun handWinner(currentHand: Map<String, Card>, suit: Suit, players: List<Player>): Pair<Player, Card> {
+
+        // 1. Was a suit or wild card played? If not set the lead out card as the suit
+        val activeSuit  = if (currentHand.filter { it.value.suit == suit || it.value.suit == Suit.WILD }.isEmpty())
+            currentHand[players[0].id]?.suit
+        else suit
+
+        // 2. Find winning card
+        val winningCard = currentHand.filter { it.value.suit == activeSuit || it.value.suit == Suit.WILD }.maxBy { it.value.value }
+                ?: throw InvalidOperationException("Can't find the winning card")
+
+        val winner = players.find { it.id == winningCard.key } ?: throw NotFoundException("Couldn't find winning player")
+
+        return Pair(winner, winningCard.value)
+    }
+
+    private fun isFollowing(suit: Suit, myCard: Card, myCards: List<Card>, playedCards: Map<String, Card>, leadOut: Suit): Boolean {
+        val suitLead = leadOut == suit || leadOut == Suit.WILD
+
+        if (suitLead) {
+            val myTrumps = myCards.filter { it.suit == suit || it.suit == Suit.WILD }
+            val winningCard = playedCards.filter { it.value.suit == suit || it.value.suit == Suit.WILD }.maxBy { it.value.value }?.value
+                    ?: throw InvalidOperationException("Can't find the winning card")
+            return myTrumps.isEmpty() || myCard.suit == suit || myCard.suit == Suit.WILD || canRenage(winningCard, myTrumps)
+        }
+
+        val mySuitedCards = myCards.filter { it.suit == leadOut }
+        return mySuitedCards.isEmpty() || myCard.suit == suit || myCard.suit == Suit.WILD || myCard.suit == leadOut
+    }
+
+    private fun canRenage(winningCard: Card, myTrumps: List<Card>): Boolean {
+        myTrumps.forEach {
+            if (!it.renegable || it.value <= winningCard.value)
+                return false
+        }
+        return true
+    }
+
+    private fun executePlayCard(players: List<Player>, round: Round, me: Player, myCard: Card) {
+        players.forEach {
+            if (it.id == me.id) {
+                it.cards.minus(myCard)
+            }
+        }
+        round.currentHand = round.currentHand.plus(Pair(me.id, myCard))
+    }
+
+    private fun nextPlayer(players: List<Player>, currentPlayer: Player): Player {
+        return generateSequence { players }.flatten().elementAt(players.indexOf(currentPlayer) + 1)
+    }
+
+    private fun previousPlayer(players: List<Player>, currentPlayer: Player): Player {
+        return generateSequence { players }.flatten().elementAt(players.indexOf(currentPlayer) - 1)
+    }
+
+    private fun orderPlayersAtStartOfGame(dealer: Player, players: List<Player>): List<Player> {
+        var playerStack = Stack<Player>()
+        playerStack.push(dealer)
+        playerStack.push(Player("dummy","dummy"))
         var currentIndex = players.indexOf(dealer)
         for(x in 0 until players.size - 1) {
             currentIndex = if(currentIndex < 1)
                 players.size - 1
             else currentIndex - 1
-            handStack.push(Hand(player = players[currentIndex]))
+            playerStack.push(players[currentIndex])
         }
-        return handStack.toMutableList().reversed()
+        return playerStack.toMutableList().reversed()
+    }
+
+    private fun orderPlayers(currentPlayer: Player, players: List<Player>): List<Player> {
+        var reorderedPlayers = emptyList<Player>()
+        var currentIndex = players.indexOf(currentPlayer)
+        val sequence = generateSequence { players }.flatten()
+
+        for(x in 0 until players.size - 1) {
+            reorderedPlayers = reorderedPlayers.plus(sequence.elementAt(x + currentIndex))
+        }
+        return reorderedPlayers
     }
 
     companion object {

@@ -1,7 +1,7 @@
 package ie.daithi.cards.web.security
 
 import com.google.common.collect.ImmutableList
-import ie.daithi.cards.repositories.mongodb.AppUserRepo
+import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.service.AppUserService
 import ie.daithi.cards.web.security.model.Authority
 import org.springframework.beans.factory.annotation.Value
@@ -48,6 +48,7 @@ class WebSecurity (
                 .antMatchers(HttpMethod.GET, "/v2/api-docs").permitAll()
                 .antMatchers(HttpMethod.GET, "/static/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/assets/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/cards/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/manifest.json").permitAll()
                 .antMatchers(HttpMethod.GET, "/index.html").permitAll()
                 .antMatchers(HttpMethod.GET, "/#/**").permitAll()
