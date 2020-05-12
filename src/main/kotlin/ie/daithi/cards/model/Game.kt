@@ -11,5 +11,6 @@ data class Game (
         val name: String,
         var status: GameStatus,
         var players: List<Player>,
-        val completedRounds: List<Round> = emptyList()
+        val completedRounds: List<Round> = emptyList(),
+        val emailMessage: String = ""
 )

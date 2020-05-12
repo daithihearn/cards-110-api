@@ -12,9 +12,10 @@ class StubEmailService(
         private val playerLoginUrl: String
 ): EmailService {
 
-    override fun sendQuizInvite(recipientEmail: String, password: String) {
+    override fun sendQuizInvite(recipientEmail: String, password: String, emailMessage: String) {
         logger.warn("As you are in dev mode, email will not send.")
         logger.warn("Logging user credentials instead: $playerLoginUrl?username=$recipientEmail&password=$password")
+        logger.warn("Email Message: $emailMessage")
     }
 
     companion object {

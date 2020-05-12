@@ -1,5 +1,5 @@
 package ie.daithi.cards.web.model.enums
 
 enum class PublishContentType {
-    LEADERBOARD;
+    GAME, ROUND, GAME_AND_ROUND, LEADERBOARD;
 }

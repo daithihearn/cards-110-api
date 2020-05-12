@@ -7,5 +7,6 @@ data class Player(
         val displayName: String,
         var call: Int = 0,
         var cards: List<Card> = emptyList(),
-        var score: Int = 0
+        var score: Int = 0,
+        val teamId: String
 )

@@ -13,7 +13,7 @@ data class Round(
         var status: RoundStatus,
         var goer: Player? = null,
         var suit: Suit? = null,
-        var leadOut: Suit? = null,
+        var leadOut: Card? = null,
         val dealer: Player,
         var currentPlayer: Player,
         var currentHand: Map<String, Card> = emptyMap(),

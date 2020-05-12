@@ -7,6 +7,7 @@ import ie.daithi.cards.model.Player
 import ie.daithi.cards.model.Round
 import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.service.GameService
+import ie.daithi.cards.service.RoundService
 import ie.daithi.cards.web.exceptions.NotFoundException
 import ie.daithi.cards.web.model.CreateGame
 import io.swagger.annotations.*
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*
 @Api(tags = ["Game"], description = "Endpoints that relate to CRUD operations on Games")
 class GameController (
         private val gameService: GameService,
+        private val roundService: RoundService,
         private val appUserRepo: AppUserRepo
 ){
 
@@ -67,7 +69,7 @@ class GameController (
     )
     @ResponseBody
     fun put(@RequestBody createGame: CreateGame): Game {
-        return gameService.create(createGame.name, createGame.playerEmails)
+        return gameService.create(createGame.name, createGame.playerEmails, createGame.emailMessage)
     }
 
     @PutMapping("/admin/game/finish")
@@ -114,8 +116,12 @@ class GameController (
             ApiResponse(code = 502, message = "An error occurred when attempting to send email")
     )
     @ResponseBody
-    fun deal(@RequestParam gameId: String): Round {
-        return gameService.deal(gameId)
+    fun deal(@RequestParam gameId: String): Pair<Game, Round> {
+        val game = gameService.get(gameId)
+        val gameAndRound = gameService.deal(game, null)
+        gameService.save(gameAndRound.first)
+        roundService.save(gameAndRound.second)
+        return gameAndRound
     }
 
     @PutMapping("/call")
@@ -125,7 +131,7 @@ class GameController (
             ApiResponse(code = 200, message = "Request successful")
     )
     @ResponseBody
-    fun call(@RequestParam call: Int): Round {
+    fun call(@RequestParam call: Int): Pair<Game, Round> {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
         val game = gameService.getByPlayerId(appUser.id!!)
@@ -139,7 +145,7 @@ class GameController (
             ApiResponse(code = 200, message = "Request successful")
     )
     @ResponseBody
-    fun buyCards(@RequestParam cards: List<Card>): Round {
+    fun buyCards(@RequestBody cards: List<Card>): Pair<Game, Round> {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
         val game = gameService.getByPlayerId(appUser.id!!)
@@ -153,16 +159,30 @@ class GameController (
             ApiResponse(code = 200, message = "Request successful")
     )
     @ResponseBody
-    fun chooseFromDummy(@RequestParam cards: List<Card>, @RequestParam trumps: Suit): Round {
+    fun chooseFromDummy(@RequestBody cards: List<Card>, @RequestParam suit: Suit): Pair<Game, Round> {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
         val game = gameService.getByPlayerId(appUser.id!!)
-        return gameService.chooseFromDummy(gameId = game.id!!, playerId = appUser.id!!, selectedCards = cards, trumps = trumps)
+        return gameService.chooseFromDummy(gameId = game.id!!, playerId = appUser.id!!, selectedCards = cards, suit = suit)
+    }
+
+    @PutMapping("/playCard")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ApiOperation(value = "Play a card", notes = "Play a card")
+    @ApiResponses(
+            ApiResponse(code = 200, message = "Request successful")
+    )
+    @ResponseBody
+    fun playCard(@RequestParam card: Card): Pair<Game, Round> {
+        val id = SecurityContextHolder.getContext().authentication.name
+        val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
+        val game = gameService.getByPlayerId(appUser.id!!)
+        return gameService.playCard(gameId = game.id!!, playerId = appUser.id!!, myCard = card)
     }
 
     @GetMapping("/game")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Get me", notes = "Get me and my cards")
+    @ApiOperation(value = "Get game", notes = "Get the game")
     @ApiResponses(
             ApiResponse(code = 200, message = "Request successful")
     )
@@ -171,7 +191,38 @@ class GameController (
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
         val game = gameService.getByPlayerId(appUser.id!!)
-        return gameService.getGameForPlayer(gameId = game.id!!, playerId = appUser.id!!)
+        val round = roundService.get(gameId = game.id!!)
+        return gameService.getGameForPlayer(game = game, round = round, playerId = appUser.id!!)
+    }
+
+    @GetMapping("/round")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ApiOperation(value = "Get the current round", notes = "Get the current round")
+    @ApiResponses(
+            ApiResponse(code = 200, message = "Request successful")
+    )
+    @ResponseBody
+    fun getRound(): Round {
+        val id = SecurityContextHolder.getContext().authentication.name
+        val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
+        val game = gameService.getByPlayerId(appUser.id!!)
+        return roundService.get(gameId = game.id!!)
+    }
+
+    @GetMapping("/gameAndRound")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ApiOperation(value = "Get the current game and round", notes = "Get the current game and round")
+    @ApiResponses(
+            ApiResponse(code = 200, message = "Request successful")
+    )
+    @ResponseBody
+    fun getGameAndRound(): Pair<Game, Round> {
+        val id = SecurityContextHolder.getContext().authentication.name
+        val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
+        val gameFull = gameService.getByPlayerId(appUser.id!!)
+        val round = roundService.get(gameId = gameFull.id!!)
+        val game = gameService.getGameForPlayer(game = gameFull, round = round, playerId = appUser.id!!)
+        return Pair(game, round)
     }
 
     companion object {
