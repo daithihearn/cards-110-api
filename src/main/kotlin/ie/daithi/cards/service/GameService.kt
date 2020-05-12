@@ -94,7 +94,7 @@ class GameService(
 
         appUserRepo.deleteByUsernameIgnoreCase(username)
         appUserRepo.save(user)
-        emailService.sendQuizInvite(username, password, emailMessage)
+        emailService.sendInvite(username, password, emailMessage)
 
         return Player(id = user.id!!, displayName = user.username!!, teamId = teamId)
     }
@@ -465,11 +465,13 @@ class GameService(
 
             bestCard = if (bestCard == null) winner
             // Both Trumps
-            else if ((bestCard!!.second.suit == round.suit && winner.second.suit == round.suit) && winner.second.value > bestCard!!.second.value) winner
+            else if (isTrump(round.suit!!, bestCard!!.second) && isTrump(round.suit!!, winner.second)
+                        && winner.second.value > bestCard!!.second.value) winner
             // Both Cold
-            else if ((bestCard!!.second.suit != round.suit && winner.second.suit != round.suit) && winner.second.coldValue > bestCard!!.second.coldValue) winner
+            else if (notTrump(round.suit!!, bestCard!!.second) && notTrump(round.suit!!, winner.second)
+                        && winner.second.coldValue > bestCard!!.second.coldValue) winner
             // Only winner is trump
-            else if (bestCard!!.second.suit != round.suit && winner.second.suit == round.suit) winner
+            else if (notTrump(round.suit!!, bestCard!!.second) && isTrump(round.suit!!, winner.second)) winner
             // Only bestCard is trump
             else bestCard
         }
@@ -507,6 +509,15 @@ class GameService(
 
         return game.players
     }
+
+    private fun isTrump(suit: Suit, card: Card): Boolean {
+        return card.suit == suit || card.suit == Suit.WILD
+    }
+
+    private fun notTrump(suit: Suit, card: Card): Boolean {
+        return !isTrump(suit, card)
+    }
+
 
     private fun updatePlayersScore(players: List<Player>, teamId: String, points: Int) {
         players.forEach {
