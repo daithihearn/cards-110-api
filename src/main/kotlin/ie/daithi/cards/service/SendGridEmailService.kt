@@ -26,7 +26,7 @@ class SendGridEmailService(
         private val playerLoginUrl: String
 ): EmailService {
 
-    override fun sendInvite(recipientEmail: String, password: String, emailMessage: String) {
+    override fun sendInvite(recipientEmail: String, username: String, password: String, emailMessage: String) {
         if(!emailValidator.isValid(recipientEmail))
             throw InvalidEmailException("Invalid email: $recipientEmail")
 
@@ -34,7 +34,7 @@ class SendGridEmailService(
         val subject = "Cards 110"
         val to = Email(recipientEmail)
         val content = Content("text/html", "<html><p>You have been invited to join a game of 110.<br><br>Please click " +
-                "<a href='$playerLoginUrl?username=$recipientEmail&password=$password'>$playerLoginUrl?username=$recipientEmail&password=$password</a> to log in</p>" +
+                "<a href='$playerLoginUrl?username=$username&password=$password'>$playerLoginUrl?username=$recipientEmail&password=$password</a> to log in</p>" +
                 "<p>$emailMessage</p></html>")
         val mail = Mail(from, subject, to, content)
 

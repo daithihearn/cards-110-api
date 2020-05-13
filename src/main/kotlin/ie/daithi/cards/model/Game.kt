@@ -3,14 +3,17 @@ package ie.daithi.cards.model
 import ie.daithi.cards.enumeration.GameStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDateTime
 
 @Document(collection="games")
 data class Game (
         @Id
         val id: String? = null,
+        val timestamp: LocalDateTime,
         val name: String,
         var status: GameStatus,
         var players: List<Player>,
-        val completedRounds: List<Round> = emptyList(),
+        var currentRound: Round,
+        var completedRounds: List<Round> = emptyList(),
         val emailMessage: String = ""
 )

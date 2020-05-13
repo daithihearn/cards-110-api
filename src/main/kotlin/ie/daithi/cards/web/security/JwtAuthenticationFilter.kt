@@ -34,6 +34,8 @@ open class JwtAuthenticationFilter(
         try {
             val user = jacksonObjectMapper().readValue(req.inputStream, AppUser::class.java)
 
+            logger.debug("Attempting authentication for $user")
+
             val appUser = user.username?.let { appUsersRepository.findByUsernameIgnoreCase(it) }
 
             val authorities = arrayListOf<SimpleGrantedAuthority>()
