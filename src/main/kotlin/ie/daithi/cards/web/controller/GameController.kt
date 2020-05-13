@@ -116,7 +116,7 @@ class GameController (
     fun deal(): Game {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
-        val game = gameService.getByPlayerId(appUser.id!!)
+        val game = gameService.getActiveByPlayerId(appUser.id!!)
         return gameService.deal(game, appUser.id!!)
     }
 
@@ -130,7 +130,7 @@ class GameController (
     fun call(@RequestParam call: Int): Game {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
-        val game = gameService.getByPlayerId(appUser.id!!)
+        val game = gameService.getActiveByPlayerId(appUser.id!!)
         return gameService.call(gameId = game.id!!, playerId = appUser.id!!, call = call)
     }
 
@@ -144,7 +144,7 @@ class GameController (
     fun buyCards(@RequestBody cards: List<Card>): Game {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
-        val game = gameService.getByPlayerId(appUser.id!!)
+        val game = gameService.getActiveByPlayerId(appUser.id!!)
         return gameService.buyCards(gameId = game.id!!, playerId = appUser.id!!, selectedCards = cards)
     }
 
@@ -158,7 +158,7 @@ class GameController (
     fun chooseFromDummy(@RequestBody cards: List<Card>, @RequestParam suit: Suit): Game {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
-        val game = gameService.getByPlayerId(appUser.id!!)
+        val game = gameService.getActiveByPlayerId(appUser.id!!)
         return gameService.chooseFromDummy(gameId = game.id!!, playerId = appUser.id!!, selectedCards = cards, suit = suit)
     }
 
@@ -172,8 +172,22 @@ class GameController (
     fun playCard(@RequestParam card: Card): Game {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
-        val game = gameService.getByPlayerId(appUser.id!!)
+        val game = gameService.getActiveByPlayerId(appUser.id!!)
         return gameService.playCard(gameId = game.id!!, playerId = appUser.id!!, myCard = card)
+    }
+
+    @PutMapping("/replay")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ApiOperation(value = "Replay the game", notes = "Replay the game")
+    @ApiResponses(
+            ApiResponse(code = 200, message = "Request successful")
+    )
+    @ResponseBody
+    fun replay(): Game {
+        val id = SecurityContextHolder.getContext().authentication.name
+        val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
+        val game = gameService.getActiveByPlayerId(appUser.id!!)
+        return gameService.replay(currentGame = game, playerId = appUser.id!!)
     }
 
     @GetMapping("/game")
@@ -186,7 +200,7 @@ class GameController (
     fun getGame(): Game {
         val id = SecurityContextHolder.getContext().authentication.name
         val appUser = appUserRepo.findByUsernameIgnoreCase(id) ?: throw NotFoundException("User not found")
-        val game = gameService.getByPlayerId(appUser.id!!)
+        val game = gameService.getActiveByPlayerId(appUser.id!!)
         return gameService.getGameForPlayer(game = game, playerId = appUser.id!!)
     }
 

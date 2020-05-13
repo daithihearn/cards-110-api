@@ -137,8 +137,8 @@ class GameService(
         return gameRepo.findAllByStatus(GameStatus.ACTIVE)
     }
 
-    fun getByPlayerId(id: String): Game {
-        return gameRepo.getByPlayerId(id)
+    fun getActiveByPlayerId(id: String): Game {
+        return gameRepo.findByPlayersIdAndStatus(id, GameStatus.ACTIVE)
     }
 
     fun finish(id: String) {
@@ -153,6 +153,62 @@ class GameService(
         if( game.status == GameStatus.CANCELLED) throw InvalidSatusException("Game is already in CANCELLED state")
         game.status = GameStatus.CANCELLED
         save(game)
+    }
+
+    fun replay(currentGame: Game, playerId: String): Game {
+
+        val timestamp = LocalDateTime.now()
+
+        // 1. Check if they are the dealer
+        val dealer = currentGame.currentRound.dealerId
+        if (dealer != playerId)
+            throw InvalidOperationException("Player $playerId is not the dealer")
+
+        // 2. Set current game as completed
+        currentGame.status = GameStatus.COMPLETED
+        save(currentGame)
+
+        // 3. Get players and
+        val oldPlayers = currentGame.players.shuffled()
+        val players = arrayListOf<Player>()
+        // If we have six players we will assume this is a team game
+        if (oldPlayers.size == 6) {
+            val teamIds = listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
+            oldPlayers.forEachIndexed { index, player ->
+                players.add(Player(id = player.id, displayName = player.displayName, teamId = teamIds[3 % index]))
+            }
+
+        } else {
+            oldPlayers.forEach { player ->
+                // For an individual game set the team ID == email
+                players.add(Player(id = player.id, displayName = player.displayName, teamId = player.displayName))
+            }
+        }
+
+        // 4. Create the first round and assign a dealer
+        val dealerId = players[0].id
+        val hand = Hand(timestamp = timestamp,
+                currentPlayerId = nextPlayer(players, dealerId).id)
+
+        val round = Round(timestamp = timestamp, number = 1, status = RoundStatus.CALLING, currentHand = hand, dealerId = dealerId)
+
+        // 5. Create Game
+        var game = Game(
+                timestamp = timestamp,
+                name = currentGame.name,
+                status = GameStatus.ACTIVE,
+                players = players,
+                currentRound = round,
+                emailMessage = currentGame.emailMessage)
+
+        // 6. Save the game
+        save(game)
+
+        // 7. Publish updated game
+        publishGame(game, playerId)
+
+        // 8. Return the game
+        return game
     }
 
     // Deal a new round
