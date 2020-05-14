@@ -138,7 +138,7 @@ class GameService(
     }
 
     fun getActiveByPlayerId(id: String): Game {
-        return gameRepo.findByPlayersIdAndStatus(id, GameStatus.ACTIVE)
+        return gameRepo.findByPlayersIdAndStatusOrStatus(id, GameStatus.ACTIVE, GameStatus.FINISHED)
     }
 
     fun finish(id: String) {
@@ -202,7 +202,7 @@ class GameService(
                 emailMessage = currentGame.emailMessage)
 
         // 6. Save the game
-        save(game)
+        game = save(game)
 
         // 7. Publish updated game
         publishGame(game, playerId)
@@ -237,7 +237,7 @@ class GameService(
         // 5. Save the game
         save(game)
 
-        // 6. Publish updated game and round
+        // 6. Publish updated game
         publishGame(game, playerId)
 
         // 7. Return the game
@@ -312,7 +312,7 @@ class GameService(
         // 9. Save game
         save(game)
 
-        // 10. Publish updated game and round
+        // 10. Publish updated game
         publishGame(game, me.id)
 
         return getGameForPlayer(game, me.id)
@@ -360,7 +360,7 @@ class GameService(
         // 10. Save game
         save(game)
 
-        // 11. Publish updated game and round
+        // 11. Publish updated game
         publishGame(game, me.id)
 
         return getGameForPlayer(game, me.id)
@@ -411,7 +411,7 @@ class GameService(
         // 9. Save game
         save(game)
 
-        // 10. Publish updated game and round
+        // 10. Publish updated game
         publishGame(game, me.id)
 
         return getGameForPlayer(game, me.id)
@@ -475,10 +475,10 @@ class GameService(
                 // Check if game is over
                 game.players.forEach {
                     if (it.score >= 110) {
-                        game.status = GameStatus.COMPLETED
+                        game.status = GameStatus.FINISHED
                     }
                 }
-                if (game.status == GameStatus.COMPLETED) {
+                if (game.status == GameStatus.FINISHED) {
                     logger.info("Game is over.")
                 } else {
                     logger.info("Game isn't over yet. Starting a new round")
@@ -495,7 +495,7 @@ class GameService(
         // 10. Save game
         save(game)
 
-        // 11. Publish updated game and round
+        // 11. Publish updated game
         publishGame(game, me.id)
 
         return getGameForPlayer(game, me.id)
