@@ -1,6 +1,6 @@
 package ie.daithi.cards.model
 
-import ie.daithi.cards.web.model.enums.PublishContentType
+import ie.daithi.cards.web.model.enums.EventType
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -9,5 +9,5 @@ data class PublishContent(
         @Id
         var gameId: String? = null,
         var content: Any? = null,
-        var type: PublishContentType? = null
+        var type: EventType? = null
 )

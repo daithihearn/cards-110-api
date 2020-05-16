@@ -13,6 +13,8 @@ class StubEmailService(
 ): EmailService {
 
     override fun sendInvite(recipientEmail: String, username: String,  password: String, emailMessage: String) {
+
+//        val normalisedUsername = username.replace(" ", "%20")
         logger.warn("As you are in dev mode, email will not send.")
         logger.warn("Logging user credentials instead: $playerLoginUrl?username=$username&password=$password")
         logger.warn("Email Message: $emailMessage")

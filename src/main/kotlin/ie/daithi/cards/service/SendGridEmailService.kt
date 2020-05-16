@@ -30,11 +30,12 @@ class SendGridEmailService(
         if(!emailValidator.isValid(recipientEmail))
             throw InvalidEmailException("Invalid email: $recipientEmail")
 
+        val normalisedUsername = username.replace(" ", "%20")
         val from = Email(fromAddress)
         val subject = "Cards 110"
         val to = Email(recipientEmail)
         val content = Content("text/html", "<html><p>You have been invited to join a game of 110.<br><br>Please click " +
-                "<a href='$playerLoginUrl?username=$username&password=$password'>$playerLoginUrl?username=$recipientEmail&password=$password</a> to log in</p>" +
+                "$playerLoginUrl?username=$normalisedUsername&password=$password to log in</p>" +
                 "<p>$emailMessage</p></html>")
         val mail = Mail(from, subject, to, content)
 

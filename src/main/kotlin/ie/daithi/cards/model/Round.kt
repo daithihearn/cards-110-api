@@ -12,5 +12,6 @@ data class Round(
         var suit: Suit? = null,
         var status: RoundStatus,
         var currentHand: Hand,
+        var dealerSeeingCall: Boolean = false,
         var completedHands: List<Hand> = emptyList()
 )

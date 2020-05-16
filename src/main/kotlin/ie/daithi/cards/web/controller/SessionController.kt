@@ -2,6 +2,7 @@ package ie.daithi.cards.web.controller
 
 import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.service.AppUserService
+import ie.daithi.cards.service.GameService
 import ie.daithi.cards.web.exceptions.NotFoundException
 import io.swagger.annotations.*
 import org.apache.logging.log4j.LogManager
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.*
 @Api(tags = ["Session"], description = "Endpoints for session info")
 class SessionController (
         private val appUserService: AppUserService,
-        private val appUserRepo: AppUserRepo
+        private val appUserRepo: AppUserRepo,
+        private val gameService: GameService
 ){
 
     @GetMapping("/isLoggedIn")
@@ -37,7 +39,12 @@ class SessionController (
     )
     @ResponseBody
     fun name(): String {
-        return SecurityContextHolder.getContext().authentication.name
+        val id = SecurityContextHolder.getContext().authentication.name
+        val appUser = appUserRepo.findById(id)
+        if (appUser.isEmpty)
+            throw NotFoundException("User not found")
+        val game = gameService.getActiveByPlayerId(appUser.get().username!!)
+        return gameService.findPlayer(game.players, id).displayName
     }
 
     @GetMapping("/id")
@@ -48,10 +55,7 @@ class SessionController (
     )
     @ResponseBody
     fun id(): String {
-        val user = appUserRepo.findByUsernameIgnoreCase(SecurityContextHolder.getContext().authentication.name)?:
-            throw NotFoundException("User not found!")
-
-        return user.id!!
+        return SecurityContextHolder.getContext().authentication.name
     }
 
     @GetMapping("/type")

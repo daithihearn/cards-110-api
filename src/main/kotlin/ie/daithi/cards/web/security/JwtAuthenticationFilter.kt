@@ -32,22 +32,23 @@ open class JwtAuthenticationFilter(
     override fun attemptAuthentication(req: HttpServletRequest,
                               res: HttpServletResponse): Authentication {
         try {
-            val user = jacksonObjectMapper().readValue(req.inputStream, AppUser::class.java)
-
+            val user = jacksonObjectMapper().readValue(req.inputStream, AppUser::class.java) ?: throw NotFoundException("Couldn't parse user")
+            if (user.username == null) throw NotFoundException("Couldn't parse user")
             logger.debug("Attempting authentication for $user")
 
-            val appUser = user.username?.let { appUsersRepository.findByUsernameIgnoreCase(it) }
+
+            val appUser = appUsersRepository.findById(user.username!!)
 
             val authorities = arrayListOf<SimpleGrantedAuthority>()
 
-            if (appUser == null)
-                throw NotFoundException("Appuser not found!")
+            if (appUser.isEmpty)
+                throw NotFoundException("User not found")
 
-            appUser.authorities?.forEach { authority -> authorities.add(SimpleGrantedAuthority(authority.toString())) }
+            appUser.get().authorities!!.forEach { authority -> authorities.add(SimpleGrantedAuthority(authority.toString())) }
 
             return authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
-                            appUser.username,
+                            appUser.get().username,
                             user.password,
                             authorities))
 

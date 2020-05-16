@@ -1,6 +1,7 @@
 package ie.daithi.cards.service
 
 import ie.daithi.cards.repositories.AppUserRepo
+import ie.daithi.cards.web.exceptions.NotFoundException
 import org.apache.logging.log4j.LogManager
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -16,15 +17,17 @@ class AppUserService (
 ): UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        val appUser = appUserRepo.findByUsernameIgnoreCase(username)
+        val appUser = appUserRepo.findById(username)
+        if (appUser.isEmpty)
+            throw NotFoundException("User not found")
 
-        if (appUser?.authorities == null)
+        if (appUser.get().authorities == null)
             throw RuntimeException("appuser not found")
 
         val authorities = arrayListOf<GrantedAuthority>()
-        appUser.authorities!!.forEach { authority -> authorities.add(SimpleGrantedAuthority(authority.toString())) }
+        appUser.get().authorities!!.forEach { authority -> authorities.add(SimpleGrantedAuthority(authority.toString())) }
 
-        return User(appUser.username, appUser.password, authorities)
+        return User(appUser.get().username, appUser.get().password, authorities)
     }
 
     companion object {
