@@ -4,10 +4,7 @@ import ie.daithi.cards.enumeration.Card
 import ie.daithi.cards.enumeration.GameStatus
 import ie.daithi.cards.enumeration.RoundStatus
 import ie.daithi.cards.enumeration.Suit
-import ie.daithi.cards.model.Game
-import ie.daithi.cards.model.Hand
-import ie.daithi.cards.model.Player
-import ie.daithi.cards.model.Round
+import ie.daithi.cards.model.*
 import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.repositories.GameRepo
 import ie.daithi.cards.validation.EmailValidator
@@ -58,14 +55,13 @@ class GameService(
         // If we have six players we will assume this is a team game
         if (createPlayersShuffled.size == 6) {
             val teamIds = listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
-            // createPlayersShuffled.forEachIndexed { index, player ->
-                players.add(createPlayer(createPlayersShuffled[0], emailMessage, teamIds[0]))
-                players.add(createPlayer(createPlayersShuffled[1], emailMessage, teamIds[1]))
-                players.add(createPlayer(createPlayersShuffled[2], emailMessage, teamIds[2]))
-                players.add(createPlayer(createPlayersShuffled[3], emailMessage, teamIds[0]))
-                players.add(createPlayer(createPlayersShuffled[4], emailMessage, teamIds[1]))
-                players.add(createPlayer(createPlayersShuffled[5], emailMessage, teamIds[2]))
-            // }
+
+            players.add(createPlayer(createPlayersShuffled[0], emailMessage, teamIds[0]))
+            players.add(createPlayer(createPlayersShuffled[1], emailMessage, teamIds[1]))
+            players.add(createPlayer(createPlayersShuffled[2], emailMessage, teamIds[2]))
+            players.add(createPlayer(createPlayersShuffled[3], emailMessage, teamIds[0]))
+            players.add(createPlayer(createPlayersShuffled[4], emailMessage, teamIds[1]))
+            players.add(createPlayer(createPlayersShuffled[5], emailMessage, teamIds[2]))
 
         } else {
             createPlayersShuffled.forEach {
@@ -230,7 +226,7 @@ class GameService(
         val deck =  deckService.getDeck(game.id)
         for(x in 0 until 5) {
             game.players.forEach {
-                it.cards = it.cards.plus(deck.cards.pop())
+                it.cards = it.cards.plus(popFromDeck(deck))
             }
         }
         deckService.save(deck)
@@ -243,6 +239,11 @@ class GameService(
 
         // 7. Return the game
         return game
+    }
+
+    private fun popFromDeck(deck: Deck): Card {
+        if (deck.cards.empty()) throw NotFoundException("The deck(${deck.id}) is empty. This should never happen.")
+        return deck.cards.pop()
     }
 
     fun call(gameId: String, playerId: String, call: Int): Game {
@@ -419,7 +420,7 @@ class GameService(
         // 8. Get new cards
         val deck = deckService.getDeck(gameId)
         var newCards = selectedCards
-        for(x in 0 until 5 - selectedCards.size) newCards = newCards.plus(deck.cards.pop())
+        for(x in 0 until 5 - selectedCards.size) newCards = newCards.plus(popFromDeck(deck))
         game.players.forEach { if (it.id == playerId) it.cards = newCards }
         deckService.save(deck)
 
