@@ -58,9 +58,14 @@ class GameService(
         // If we have six players we will assume this is a team game
         if (createPlayersShuffled.size == 6) {
             val teamIds = listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
-            createPlayersShuffled.forEachIndexed { index, player ->
-                players.add(createPlayer(player, emailMessage, teamIds[3 % index]))
-            }
+            // createPlayersShuffled.forEachIndexed { index, player ->
+                players.add(createPlayer(createPlayersShuffled[0], emailMessage, teamIds[0]))
+                players.add(createPlayer(createPlayersShuffled[1], emailMessage, teamIds[1]))
+                players.add(createPlayer(createPlayersShuffled[2], emailMessage, teamIds[2]))
+                players.add(createPlayer(createPlayersShuffled[3], emailMessage, teamIds[0]))
+                players.add(createPlayer(createPlayersShuffled[4], emailMessage, teamIds[1]))
+                players.add(createPlayer(createPlayersShuffled[5], emailMessage, teamIds[2]))
+            // }
 
         } else {
             createPlayersShuffled.forEach {
