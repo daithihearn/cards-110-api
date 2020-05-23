@@ -465,7 +465,6 @@ class GameService(
             throw InvalidOperationException("You can't select this card: $myCard")
 
         // 7. Check that they are following suit
-
         if (currentHand.leadOut == null)
             currentHand.leadOut = myCard
         else if (!isFollowing(myCard, me.cards, currentHand, suit))
@@ -473,9 +472,7 @@ class GameService(
 
         // 8. Play the card
         game.players.forEach {
-            if (it.id == me.id) {
-                it.cards = it.cards.minus(myCard)
-            }
+            if (it.id == me.id) it.cards = it.cards.minus(myCard)
         }
         currentHand.playedCards = currentHand.playedCards.plus(Pair(me.id, myCard))
 
@@ -490,7 +487,7 @@ class GameService(
 
             // Publish the game and wait 4 seconds. This is to allow time to see the card
             // TODO Use a computable future or something rather than stopping the thread
-            publishGame(Pair(game, null), null, type)
+            publishGame(Pair(game, null), null, EventType.LAST_CARD_PLAYED)
             Thread.sleep(4000)
 
             if (currentRound.completedHands.size >= 4) {
@@ -498,8 +495,6 @@ class GameService(
 
                 // Calculate Scores
                 calculateScores(game)
-
-                logger.info("Players after calculating score: ${game.players}")
 
                 // Check if game is over
                 game.players.forEach {
