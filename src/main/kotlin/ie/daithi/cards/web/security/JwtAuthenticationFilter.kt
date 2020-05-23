@@ -34,11 +34,9 @@ open class JwtAuthenticationFilter(
         try {
             val user = jacksonObjectMapper().readValue(req.inputStream, AppUser::class.java) ?: throw NotFoundException("Couldn't parse user")
             if (user.username == null) throw NotFoundException("Couldn't parse user")
-            logger.debug("Attempting authentication for $user")
-
+            logger.debug("Attempting authentication for ${user.username}")
 
             val appUser = appUsersRepository.findById(user.username!!)
-
             val authorities = arrayListOf<SimpleGrantedAuthority>()
 
             if (appUser.isEmpty)

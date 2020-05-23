@@ -43,7 +43,7 @@ version = "0.0.1-SNAPSHOT"
 
 description = "api"
 
-val springBootVersion: String = "2.2.6.RELEASE"
+val springBootVersion: String = "2.2.7.RELEASE"
 val swaggerVersion: String = "2.9.2"
 
 dependencies {
@@ -58,7 +58,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.72")
 
 	//Spring dependencies
-	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")

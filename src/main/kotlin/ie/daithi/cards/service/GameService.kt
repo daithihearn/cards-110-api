@@ -131,7 +131,7 @@ class GameService(
     }
 
     fun getActive(): List<Game> {
-        return gameRepo.findAllByStatus(GameStatus.ACTIVE)
+        return gameRepo.findAllByStatusOrStatus(GameStatus.ACTIVE, GameStatus.FINISHED)
     }
 
     fun getActiveByPlayerId(id: String): Game {
