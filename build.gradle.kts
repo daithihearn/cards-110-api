@@ -49,15 +49,14 @@ val swaggerVersion: String = "2.9.2"
 dependencies {
 
 	// Internal Dependencies
-	implementation("ie.daithi.cards:cards-110-frontend:$version")
 
-	//External Dependencies
+	// External Dependencies
 
-	//Kotlin dependencies
+	// Kotlin dependencies
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.72")
 
-	//Spring dependencies
+	// Spring dependencies
 	implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
@@ -65,7 +64,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
 
-	//Springfox
+	// Springfox
 	implementation("io.springfox:springfox-swagger2:$swaggerVersion")
 	implementation("io.springfox:springfox-swagger-ui:$swaggerVersion")
 

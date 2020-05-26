@@ -135,7 +135,10 @@ class GameService(
     }
 
     fun getActiveByPlayerId(id: String): Game {
-        return gameRepo.findByPlayersIdAndStatusOrStatus(id, GameStatus.ACTIVE, GameStatus.FINISHED)
+        val result = gameRepo.findByPlayersIdAndStatusOrStatus(id, GameStatus.ACTIVE, GameStatus.FINISHED)
+        if (result.isPresent)
+            return result.get()
+        throw NotFoundException("No game found for player")
     }
 
     fun finish(id: String) {

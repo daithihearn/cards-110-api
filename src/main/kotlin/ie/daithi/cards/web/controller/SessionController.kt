@@ -4,6 +4,7 @@ import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.service.AppUserService
 import ie.daithi.cards.service.GameService
 import ie.daithi.cards.web.exceptions.NotFoundException
+import ie.daithi.cards.web.security.model.Authority
 import io.swagger.annotations.*
 import org.apache.logging.log4j.LogManager
 import org.springframework.http.HttpStatus
@@ -43,6 +44,8 @@ class SessionController (
         val appUser = appUserRepo.findById(id)
         if (appUser.isEmpty)
             throw NotFoundException("User not found")
+        if (appUser.get().authorities!!.contains(Authority.ADMIN))
+            return appUser.get().username ?: ""
         val game = gameService.getActiveByPlayerId(appUser.get().username!!)
         return gameService.findPlayer(game.players, id).displayName
     }
