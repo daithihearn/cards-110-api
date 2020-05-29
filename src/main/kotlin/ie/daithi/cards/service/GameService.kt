@@ -263,13 +263,13 @@ class GameService(
         // 4. Get current hand
         val currentHand = currentRound.currentHand
 
-        // 4. Get myself
+        // 5. Get myself
         val me = findPlayer(game.players, currentHand.currentPlayerId)
 
-        // 5. Check they are the next player
+        // 6. Check they are the next player
         if (currentHand.currentPlayerId != playerId) throw InvalidOperationException("It's not your go!")
 
-        // 6. Check if call value is valid i.e. > all other calls
+        // 7. Check if call value is valid i.e. > all other calls
         if  (currentRound.dealerSeeingCall) {
             me.call = call
         } else if (call != 0) {
@@ -279,10 +279,11 @@ class GameService(
             else throw InvalidOperationException("Call must be higher than ${currentCaller.call}")
         }
 
-        // 7. Update my call
+        // 8. Update my call
         game.players.forEach { if (it.id == me.id) it.call = me.call }
 
-        // 8. Set next player/round status
+        // 9. Set next player/round status
+        var type = EventType.CALL
         if (call == 30) {
             logger.info("Jink called by $me")
             if (currentHand.currentPlayerId == currentRound.dealerId) {
@@ -303,15 +304,16 @@ class GameService(
             if (caller.call == 0 && me.call == 0) {
                 logger.info("Nobody called anything. Will have to re-deal.")
                 completeRound(game)
+                type = EventType.ROUND_COMPLETED
             } else if (me.call == caller.call && me.id != caller.id) {
                 logger.info("Dealer saw a call. Go back to caller.")
                 currentHand.currentPlayerId = caller.id
                 currentRound.dealerSeeingCall = true
             } else if (caller.call == 10) {
-                logger.info("Can go on 10")
+                logger.info("Can't go 10")
                 completeRound(game)
-            }
-            else {
+                type = EventType.ROUND_COMPLETED
+            } else {
                 logger.info("Successful call $caller")
                 currentRound.status = RoundStatus.CALLED
                 currentRound.goerId = caller.id
@@ -337,11 +339,11 @@ class GameService(
             currentHand.currentPlayerId = nextPlayer(game.players, me.id).id
         }
 
-        // 9. Save game
+        // 10. Save game
         save(game)
 
-        // 10. Publish updated game
-        publishGame(Pair(game, null), me.id, EventType.CALL)
+        // 11. Publish updated game
+        publishGame(Pair(game, null), me.id, type)
 
         return getGameForPlayer(game, me.id)
     }
@@ -586,12 +588,18 @@ class GameService(
                 number = game.currentRound.number + 1,
                 dealerId = nextDealerId,
                 currentHand = nextHand, status = RoundStatus.CALLING)
+
+        // 3. Clear cards
+        game.players.forEach { player ->
+            player.cards = emptyList()
+        }
+
         return game
     }
 
     private fun publishGame(payload: Pair<Game, String?>, callerId: String?, type: EventType) {
 
-        payload.first.players.forEach {player ->
+        payload.first.players.forEach { player ->
             if (callerId == null || (player.id != callerId && player.id != "dummy")) {
                 publishService.publishContent(recipient = player.id,
                         topic = "/game",

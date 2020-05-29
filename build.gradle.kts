@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
-	val kotlinVersion = "1.3.50"
-	val springBootVersion = "2.2.6.RELEASE"
+	val kotlinVersion = "1.3.72"
+	val springBootVersion = "2.3.0.RELEASE"
 	repositories {
 		mavenLocal()
 		mavenCentral()
@@ -14,16 +14,14 @@ buildscript {
 }
 
 plugins {
-	id("org.springframework.boot") version "2.2.6.RELEASE"
-	id("io.spring.dependency-management") version "1.0.9.RELEASE"
-	id("maven-publish")
-	kotlin("jvm") version "1.3.61"
-	kotlin("plugin.spring") version "1.3.71"
+    id("org.springframework.boot") version "2.3.0.RELEASE"
+    id("maven-publish")
+    id("org.jetbrains.kotlin.jvm") version "1.3.72"
+	kotlin("plugin.spring") version "1.3.72"
 }
 
 apply(plugin = "maven")
-apply(plugin = "org.springframework.boot")
-apply(plugin = "kotlin")
+apply(plugin = "io.spring.dependency-management")
 
 tasks.withType<JavaCompile> {
 	options.encoding = "UTF-8"
@@ -40,10 +38,11 @@ repositories {
 
 group = "ie.daithi.cards"
 version = "0.0.1-SNAPSHOT"
+java.sourceCompatibility = JavaVersion.VERSION_13
 
 description = "api"
 
-val springBootVersion: String = "2.2.7.RELEASE"
+val springBootVersion: String = "2.3.0.RELEASE"
 val swaggerVersion: String = "2.9.2"
 
 dependencies {
@@ -80,6 +79,6 @@ dependencies {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "12"
+		jvmTarget = "13"
 	}
 }
