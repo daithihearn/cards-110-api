@@ -228,19 +228,20 @@ class GameService(
         // 4. Deal the cards
         val deck =  deckService.getDeck(game.id)
         for(x in 0 until 5) {
-            game.players.forEach {
-                it.cards = it.cards.plus(popFromDeck(deck))
-            }
+            game.players.forEach { player -> player.cards = player.cards.plus(popFromDeck(deck)) }
         }
         deckService.save(deck)
 
-        // 5. Save the game
+        // 5. Reset bought cards
+        game.players.forEach { player -> player.cardsBought = null }
+
+        // 6. Save the game
         save(game)
 
-        // 6. Publish updated game
+        // 7. Publish updated game
         publishGame(Pair(game, null), playerId, EventType.DEAL)
 
-        // 7. Return the game
+        // 8. Return the game
         return game
     }
 
@@ -426,7 +427,10 @@ class GameService(
         val deck = deckService.getDeck(gameId)
         var newCards = selectedCards
         for(x in 0 until 5 - selectedCards.size) newCards = newCards.plus(popFromDeck(deck))
-        game.players.forEach { if (it.id == playerId) it.cards = newCards }
+        game.players.forEach { player -> if (player.id == playerId) {
+            player.cards = newCards
+            player.cardsBought = 5 - selectedCards.size
+        } }
         deckService.save(deck)
 
         // 9. Set next player
