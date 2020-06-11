@@ -37,7 +37,7 @@ repositories {
 }
 
 group = "ie.daithi.cards"
-version = "0.0.1-SNAPSHOT"
+version = "1.0.0-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_13
 
 description = "api"
@@ -61,6 +61,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
+	implementation("org.springframework.security:spring-security-oauth2-resource-server:5.3.3.RELEASE")
+	implementation("org.springframework.security:spring-security-oauth2-jose:5.3.3.RELEASE")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
 
 	// Springfox
