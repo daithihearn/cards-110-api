@@ -12,8 +12,8 @@ class PublishService(
         private val messageSender: SimpMessagingTemplate,
         private val objectMapper: ObjectMapper
 ) {
-    fun publishContent(recipients: List<String>, topic: String, content: Any, gameId: String, contentType: EventType): PublishContent {
-        val contentWrapped = PublishContent(gameId = gameId, type = contentType, content = content)
+    fun publishContent(recipients: List<String>, topic: String, content: Any, contentType: EventType): PublishContent {
+        val contentWrapped = PublishContent(type = contentType, content = content)
         publishContent(recipients, topic, contentWrapped)
         return contentWrapped
     }
@@ -26,7 +26,7 @@ class PublishService(
         return content
     }
 
-    fun publishContent(recipient: String, topic: String, content: Any, gameId: String, contentType: EventType): PublishContent {
-        return publishContent(listOf(recipient), topic, content, gameId, contentType)
+    fun publishContent(recipient: String, topic: String, content: Any, contentType: EventType): PublishContent {
+        return publishContent(listOf(recipient), topic, content, contentType)
     }
 }

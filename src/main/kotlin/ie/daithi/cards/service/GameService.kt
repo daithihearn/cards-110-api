@@ -563,10 +563,9 @@ class GameService(
 
         payload.first.players.forEach { player ->
             if (callerId == null || (player.id != callerId && player.id != "dummy")) {
-                publishService.publishContent(recipient = player.id,
+                publishService.publishContent(recipient = "${player.id}${payload.first.id!!}",
                         topic = "/game",
                         content = Pair(getGameForPlayer(game = payload.first, playerId = player.id), payload.second),
-                        gameId = payload.first.id!!,
                         contentType = type)
             }
         }
