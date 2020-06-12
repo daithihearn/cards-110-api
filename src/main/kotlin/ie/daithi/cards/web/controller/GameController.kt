@@ -68,13 +68,14 @@ class GameController (
     @ResponseBody
     fun getPlayersForGame(@RequestParam gameId: String): List<AppUser> {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id) && game.adminId != id) throw ForbiddenException("Can only get players if you are part of the game or are the admin.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!) && game.adminId != user.id!!) throw ForbiddenException("Can only get players if you are part of the game or are the admin.")
 
         // 4. Get players
         return appUserService.getUsers(game.players.map { player -> player.id})
@@ -89,10 +90,11 @@ class GameController (
     @ResponseBody
     fun getMyActive(): List<Game> {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get active games for player
-        return gameService.getActiveForPlayer(id)
+        return gameService.getActiveForPlayer(user.id!!)
     }
 
     @GetMapping("/admin/game/active")
@@ -104,10 +106,11 @@ class GameController (
     @ResponseBody
     fun getActiveGamesForAdmin(): List<Game> {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get active games for admin
-        return gameService.getActiveForAdmin(id)
+        return gameService.getActiveForAdmin(user.id!!)
     }
 
     @PutMapping("/admin/game")
@@ -119,8 +122,9 @@ class GameController (
     )
     @ResponseBody
     fun put(@RequestBody createGame: CreateGame): Game {
-	val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
-        return gameService.create(adminId = id, name= createGame.name, playerIds = createGame.players)
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
+        return gameService.create(adminId = user.id!!, name= createGame.name, playerIds = createGame.players)
     }
 
     @PutMapping("/admin/game/finish")
@@ -169,16 +173,17 @@ class GameController (
     @ResponseBody
     fun deal(@RequestParam gameId: String): Game {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id)) throw ForbiddenException("Can only deal if you are part of the game.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only deal if you are part of the game.")
 	
 	    // 4. Deal
-        return gameService.deal(game, id)
+        return gameService.deal(game, user.id!!)
     }
 
     @PutMapping("/call")
@@ -190,16 +195,17 @@ class GameController (
     @ResponseBody
     fun call(@RequestParam gameId: String, @RequestParam call: Int): Game {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id)) throw ForbiddenException("Can only call if you are part of the game.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only call if you are part of the game.")
 	
 	// 4. Call
-        return gameService.call(gameId = game.id!!, playerId = id, call = call)
+        return gameService.call(gameId = game.id!!, playerId = user.id!!, call = call)
     }
 
     @PutMapping("/buyCards")
@@ -212,16 +218,17 @@ class GameController (
     // TODO: Might need a wrapper object here
     fun buyCards(@RequestParam gameId: String, @RequestBody cards: List<Card>): Game {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id)) throw ForbiddenException("Can only buy cards if you are part of the game.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only buy cards if you are part of the game.")
 	
 	    // 4. Buy cards
-        return gameService.buyCards(gameId = game.id!!, playerId = id, selectedCards = cards)
+        return gameService.buyCards(gameId = game.id!!, playerId = user.id!!, selectedCards = cards)
     }
 
     @PutMapping("/chooseFromDummy")
@@ -233,16 +240,17 @@ class GameController (
     @ResponseBody
     fun chooseFromDummy(@RequestParam gameId: String, @RequestParam suit: Suit, @RequestBody cards: List<Card>): Game {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id)) throw ForbiddenException("Can only choose from the dummy if you are part of the game.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only choose from the dummy if you are part of the game.")
 	
 	    // 4. Choose from dummy
-        return gameService.chooseFromDummy(gameId = game.id!!, playerId = id, selectedCards = cards, suit = suit)
+        return gameService.chooseFromDummy(gameId = game.id!!, playerId = user.id!!, selectedCards = cards, suit = suit)
     }
 
     @PutMapping("/playCard")
@@ -254,16 +262,17 @@ class GameController (
     @ResponseBody
     fun playCard(@RequestParam gameId: String, @RequestParam card: Card): Game {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id)) throw ForbiddenException("Can only play card if you are part of the game.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only play card if you are part of the game.")
 	
 	    // 4. Play card
-        return gameService.playCard(gameId = game.id!!, playerId = id, myCard = card)
+        return gameService.playCard(gameId = game.id!!, playerId = user.id!!, myCard = card)
     }
 
     @PutMapping("/replay")
@@ -275,16 +284,17 @@ class GameController (
     @ResponseBody
     fun replay(@RequestParam gameId: String): Game {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id)) throw ForbiddenException("Can only replay game if you are part of the game.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only replay game if you are part of the game.")
 	
 	    // 4. Replay
-        return gameService.replay(currentGame = game, playerId = id)
+        return gameService.replay(currentGame = game, playerId = user.id!!)
     }
 
     @GetMapping("/game")
@@ -296,16 +306,17 @@ class GameController (
     @ResponseBody
     fun getGameForPlayer(@RequestParam gameId: String): Game {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(id)) throw ForbiddenException("Can only replay game if you are part of the game.")
+        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only replay game if you are part of the game.")
 	
 	    // 4. Get game for player
-        return gameService.getGameForPlayer(game = game, playerId = id)
+        return gameService.getGameForPlayer(game = game, playerId = user.id!!)
     }
 
     companion object {

@@ -29,8 +29,25 @@ class AppUserService (
         return appUserRepo.existsById(id)
     }
 
-    fun updateUser(appUser: AppUser) {
+    fun updateUser(subject: String, name: String, email: String, picture: String?) {
+        // 1. Check if a user exists with this email address
+        val existingUser = appUserRepo.findOneByEmail(email)
+
+        val appUser = if (existingUser.isPresent)
+            AppUser(id = existingUser.get().id, subject = subject, name = name, email = email, picture = picture)
+        else
+            AppUser(subject = subject, name = name, email = email, picture = picture)
+
+        // 2. Save record
         appUserRepo.save(appUser)
+    }
+
+    fun existsBySubject(subject: String): Boolean {
+        return appUserRepo.existsBySubject(subject)
+    }
+
+    fun getUserBySubject(subject: String): AppUser {
+        return appUserRepo.findOneBySubject(subject)
     }
 
     companion object {

@@ -28,10 +28,11 @@ class ProfileController(
     @ResponseBody
     fun hasProfile(): Boolean {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Check if a record exists
-        return appUserService.exists(id)
+        return appUserService.exists(user.id!!)
     }
 
     @GetMapping("/profile")
@@ -43,10 +44,11 @@ class ProfileController(
     @ResponseBody
     fun getProfile(): AppUser {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val user = appUserService.getUserBySubject(subject)
 
         // 2. Check if a record exists
-        return appUserService.getUser(id)
+        return appUserService.getUser(user.id!!)
     }
 
     @PutMapping("/profile")
@@ -57,9 +59,12 @@ class ProfileController(
     )
     fun updateProfile(@RequestBody updateProfile: UpdateProfile) {
         // 1. Get current user ID
-        val id = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
 
         // 2. Check if a record exists
-        return appUserService.updateUser(AppUser(id = id, name = updateProfile.name, picture = updateProfile.picture))
+        return appUserService.updateUser(subject = subject,
+                name = updateProfile.name,
+                email = updateProfile.email.trim().toLowerCase(),
+                picture = updateProfile.picture)
     }
 }
