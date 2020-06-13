@@ -1,5 +1,6 @@
 package ie.daithi.cards.config
 
+import ie.daithi.cards.service.AppUserService
 import ie.daithi.cards.web.security.websocket.HttpHandshakeInterceptor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
@@ -14,7 +15,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 class WebSocketConfig (
         @Value("#{'\${cors.whitelist}'.split(',')}")
         private val allowedOrigins: List<String>,
-        private val jwtDecoder: JwtDecoder
+        private val jwtDecoder: JwtDecoder,
+        private val appUserService: AppUserService
 ): WebSocketMessageBrokerConfigurer {
 
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
@@ -27,7 +29,7 @@ class WebSocketConfig (
         // TODO: Only supports one origin
         registry.addEndpoint("/websocket/")
                 .setAllowedOrigins(allowedOrigins.first())
-                .setHandshakeHandler(HttpHandshakeInterceptor(jwtDecoder))
+                .setHandshakeHandler(HttpHandshakeInterceptor(jwtDecoder, appUserService))
                 .withSockJS()
     }
 
