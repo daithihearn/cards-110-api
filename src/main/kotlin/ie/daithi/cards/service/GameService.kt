@@ -112,7 +112,7 @@ class GameService(
         save(game)
     }
 
-    fun replay(currentGame: Game, playerId: String): Game {
+    fun replay(currentGame: Game, playerId: String) {
 
         val timestamp = LocalDateTime.now()
 
@@ -163,14 +163,11 @@ class GameService(
         game = save(game)
 
         // 7. Publish updated game
-        publishGame(Pair(game, null), playerId, EventType.REPLAY)
-
-        // 8. Return the game
-        return game
+        publishGame(game = game, type = EventType.REPLAY)
     }
 
     // Deal a new round
-    fun deal(game: Game, playerId: String): Game {
+    fun deal(game: Game, playerId: String) {
 
         // 1. Check if they are the dealer
         val dealer = game.currentRound.dealerId
@@ -197,10 +194,7 @@ class GameService(
         save(game)
 
         // 7. Publish updated game
-        publishGame(Pair(game, null), playerId, EventType.DEAL)
-
-        // 8. Return the game
-        return game
+        publishGame(game = game, type = EventType.DEAL)
     }
 
     private fun popFromDeck(deck: Deck): Card {
@@ -208,7 +202,7 @@ class GameService(
         return deck.cards.pop()
     }
 
-    fun call(gameId: String, playerId: String, call: Int): Game {
+    fun call(gameId: String, playerId: String, call: Int) {
         // 1. Validate call value
         if(!VALID_CALL.contains(call)) throw InvalidOperationException("Call value $call is invalid")
 
@@ -302,12 +296,10 @@ class GameService(
         save(game)
 
         // 11. Publish updated game
-        publishGame(Pair(game, null), me.id, type)
-
-        return getGameForPlayer(game, me.id)
+        publishGame(game = game, type = type)
     }
 
-    fun chooseFromDummy(gameId: String, playerId: String, selectedCards: List<Card>, suit: Suit): Game {
+    fun chooseFromDummy(gameId: String, playerId: String, selectedCards: List<Card>, suit: Suit) {
         // 1. Get Game
         val game = get(gameId)
 
@@ -349,12 +341,10 @@ class GameService(
         save(game)
 
         // 11. Publish updated game
-        publishGame(Pair(game, null), me.id, EventType.CHOOSE_FROM_DUMMY)
-
-        return getGameForPlayer(game, me.id)
+        publishGame(game = game, type = EventType.CHOOSE_FROM_DUMMY)
     }
 
-    fun buyCards(gameId: String, playerId: String, selectedCards: List<Card>): Game {
+    fun buyCards(gameId: String, playerId: String, selectedCards: List<Card>) {
         // 1. Get Game
         val game = get(gameId)
 
@@ -402,12 +392,10 @@ class GameService(
         save(game)
 
         // 10. Publish updated game
-        publishGame(Pair(game, "${me.id} bought ${5 - selectedCards.size} cards"), me.id, EventType.BUY_CARDS)
-
-        return getGameForPlayer(game, me.id)
+        publishGame(game = game, type = EventType.BUY_CARDS)
     }
 
-    fun playCard(gameId: String, playerId: String, myCard: Card): Game {
+    fun playCard(gameId: String, playerId: String, myCard: Card) {
         // 1. Get Game
         val game = get(gameId)
 
@@ -438,8 +426,8 @@ class GameService(
             throw InvalidOperationException("Must follow suit!")
 
         // 8. Play the card
-        game.players.forEach {
-            if (it.id == me.id) it.cards = it.cards.minus(myCard)
+        game.players.forEach { player ->
+            if (player.id == me.id) player.cards = player.cards.minus(myCard)
         }
         currentHand.playedCards = currentHand.playedCards.plus(Pair(me.id, myCard))
 
@@ -454,7 +442,7 @@ class GameService(
 
             // Publish the game and wait 4 seconds. This is to allow time to see the card
             // TODO Use a computable future or something rather than stopping the thread
-            publishGame(Pair(game, null), null, EventType.LAST_CARD_PLAYED)
+            publishGame(game = game, type = EventType.LAST_CARD_PLAYED)
             Thread.sleep(4000)
 
             if (currentRound.completedHands.size >= 4) {
@@ -490,29 +478,32 @@ class GameService(
         save(game)
 
         // 11. Publish updated game
-        publishGame(Pair(game, null), me.id, type)
-
-        return getGameForPlayer(game, me.id)
+        publishGame(game = game, type = type)
     }
 
-    fun getGameForPlayer(game: Game, playerId: String): Game {
-        // TODO Make this work without modifying the object
-        // 1. Create a copy of the game object
-        // val gameModified = game.copy()
-        //        val players = gameModified.players.toMutableList()
-        //
-        //        players.forEach {
-        //            it.cards = it.cards.toMutableList()
-        //        }
-        //
-        //        logger.info("Before: $players")
-        //        // 2. Filter out cards of other players
-        //        players.forEach { if (!(it.id == playerId || (it.id == "dummy" && playerId == round.goer?.id))) it.cards = emptyList() }
-        //        gameModified.players = players
-        //
-        // logger.info("After: $players")
-        // return gameModified
-        return game
+    fun parsePlayerGameState(game: Game, playerId: String): PlayerGameState {
+
+        // 1. Find player
+        val me = game.players.find { player -> player.id == playerId } ?: throw NotFoundException("Can't find player")
+
+        // 2. Find dummy
+        val dummy = (game.currentRound.goerId == playerId).let {
+            game.players.find { player -> player.id == "dummy" }
+        }
+
+        // 3. Get max call
+        val highestCaller = game.players.maxBy { player -> player.call }
+
+        // 5. Return player's game state
+        return PlayerGameState(
+                me = me,
+                cards = me.cards,
+                status = game.status,
+                dummy = dummy?.cards,
+                round = game.currentRound,
+                maxCall = highestCaller?.call ?: 0,
+                playerProfiles = game.players.filter { p -> p.id != "dummy" }
+        )
     }
 
     private fun completeHand(game: Game): Game {
@@ -559,13 +550,13 @@ class GameService(
         return game
     }
 
-    private fun publishGame(payload: Pair<Game, String?>, callerId: String?, type: EventType) {
+    private fun publishGame(game: Game, type: EventType) {
 
-        payload.first.players.forEach { player ->
-            if (callerId == null || (player.id != callerId && player.id != "dummy")) {
-                publishService.publishContent(recipient = "${player.id}${payload.first.id!!}",
+        game.players.forEach { player ->
+            if (player.id != "dummy") {
+                publishService.publishContent(recipient = "${player.id}${game.id!!}",
                         topic = "/game",
-                        content = Pair(getGameForPlayer(game = payload.first, playerId = player.id), payload.second),
+                        content = parsePlayerGameState(game = game, playerId = player.id),
                         contentType = type)
             }
         }
