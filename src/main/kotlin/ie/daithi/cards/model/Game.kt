@@ -12,6 +12,7 @@ data class Game (
         val timestamp: LocalDateTime,
         val name: String,
         var status: GameStatus,
+	    val adminId: String,
         var players: List<Player>,
         var currentRound: Round,
         var completedRounds: List<Round> = emptyList(),

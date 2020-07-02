@@ -40,3 +40,6 @@ dump.rdb
 velocity.log*
 bin/
 .vscode/
+
+# Deployment Script
+deploy.sh

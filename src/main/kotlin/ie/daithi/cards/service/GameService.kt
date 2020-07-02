@@ -5,69 +5,47 @@ import ie.daithi.cards.enumeration.GameStatus
 import ie.daithi.cards.enumeration.RoundStatus
 import ie.daithi.cards.enumeration.Suit
 import ie.daithi.cards.model.*
-import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.repositories.GameRepo
-import ie.daithi.cards.validation.EmailValidator
-import ie.daithi.cards.web.exceptions.InvalidEmailException
 import ie.daithi.cards.web.exceptions.InvalidOperationException
-import ie.daithi.cards.web.exceptions.InvalidSatusException
+import ie.daithi.cards.web.exceptions.InvalidStatusException
 import ie.daithi.cards.web.exceptions.NotFoundException
-import ie.daithi.cards.web.model.CreatePlayer
 import ie.daithi.cards.web.model.enums.EventType
-import ie.daithi.cards.web.security.model.AppUser
-import ie.daithi.cards.web.security.model.Authority
 import org.apache.logging.log4j.LogManager
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import java.security.MessageDigest
 import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.util.*
-import kotlin.math.round
 
 @Service
 class GameService(
         private val gameRepo: GameRepo,
-        private val emailValidator: EmailValidator,
-        private val emailService: EmailService,
-        private val appUserRepo: AppUserRepo,
-        private val passwordEncoder: BCryptPasswordEncoder,
         private val deckService: DeckService,
         private val publishService: PublishService
 ) {
-    fun create(name: String, createPlayers: List<CreatePlayer>, emailMessage: String): Game {
+    fun create(adminId: String, name: String, playerIds: List<String>): Game {
         logger.info("Attempting to start a 110")
 
         // 1. Validate number of players
-        if (createPlayers.size !in 2..6) throw InvalidOperationException("Please add 2-6 players")
+        if (playerIds.size !in 2..6) throw InvalidOperationException("Please add 2-6 players")
 
-        // 2. Put all emails to lower case
-        val createPlayersShuffled = createPlayers.shuffled()
-
-        // 3. Validate Emails
-        createPlayersShuffled.forEach {
-            if (!emailValidator.isValid(it.email))
-                throw InvalidEmailException("Invalid email $it")
-        }
+        // 2. Shuffle players
+        val playerIdsShuffled = playerIds.shuffled()
 
         // 4. Create Players and Issue emails
         val players = arrayListOf<Player>()
         // If we have six players we will assume this is a team game
-        if (createPlayersShuffled.size == 6) {
+        if (playerIdsShuffled.size == 6) {
             val teamIds = listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
 
-            players.add(createPlayer(createPlayersShuffled[0], emailMessage, teamIds[0]))
-            players.add(createPlayer(createPlayersShuffled[1], emailMessage, teamIds[1]))
-            players.add(createPlayer(createPlayersShuffled[2], emailMessage, teamIds[2]))
-            players.add(createPlayer(createPlayersShuffled[3], emailMessage, teamIds[0]))
-            players.add(createPlayer(createPlayersShuffled[4], emailMessage, teamIds[1]))
-            players.add(createPlayer(createPlayersShuffled[5], emailMessage, teamIds[2]))
+            players.add(Player(id = playerIdsShuffled[0], seatNumber = 1, teamId = teamIds[0]))
+            players.add(Player(id = playerIdsShuffled[1], seatNumber = 2, teamId = teamIds[1]))
+            players.add(Player(id = playerIdsShuffled[2], seatNumber = 3, teamId = teamIds[2]))
+            players.add(Player(id = playerIdsShuffled[3], seatNumber = 4, teamId = teamIds[0]))
+            players.add(Player(id = playerIdsShuffled[4], seatNumber = 5, teamId = teamIds[1]))
+            players.add(Player(id = playerIdsShuffled[5], seatNumber = 6, teamId = teamIds[2]))
 
         } else {
-            createPlayersShuffled.forEach {
-                // For an individual game set the team ID == email
-                players.add(createPlayer(it, emailMessage, it.displayName))
-            }
+            playerIdsShuffled.forEachIndexed { index, playerId -> players.add(Player(id = playerId, seatNumber = index + 1, teamId = playerId)) }
         }
 
         // 5. Create the first round and assign a dealer
@@ -83,32 +61,14 @@ class GameService(
                 timestamp = timestamp,
                 name = name,
                 status = GameStatus.ACTIVE,
+                adminId = adminId,
                 players = players,
-                currentRound = round,
-                emailMessage = emailMessage)
+                currentRound = round)
 
         game = save(game)
 
         logger.info("Game started successfully ${game.id}")
         return game
-    }
-
-    fun createPlayer(createPlayer: CreatePlayer, emailMessage: String, teamId: String): Player {
-        val passwordByte = ByteArray(16)
-        secureRandom.nextBytes(passwordByte)
-        val md = MessageDigest.getInstance("SHA-256")
-        val digest = md.digest(passwordByte)
-        val password = digest.fold("", { str, byt -> str + "%02x".format(byt) })
-        val displayName = createPlayer.displayName.trim()
-        val emailAddress = createPlayer.email.toLowerCase().trim()
-
-        var user = AppUser(password = passwordEncoder.encode(password),
-                authorities = listOf(Authority.PLAYER))
-
-        user = appUserRepo.save(user)
-        emailService.sendInvite(emailAddress, user.username!!, password, emailMessage)
-
-        return Player(id = user.username!!, displayName = displayName, teamId = teamId)
     }
 
     fun get(id: String): Game {
@@ -130,29 +90,29 @@ class GameService(
         return gameRepo.findAll()
     }
 
-    fun getActive(): List<Game> {
-        return gameRepo.findAllByStatusOrStatus(GameStatus.ACTIVE, GameStatus.FINISHED)
+    fun getActiveForPlayer(playerId: String): List<Game> {
+        return gameRepo.findByPlayersIdAndStatusOrStatus(playerId, GameStatus.ACTIVE, GameStatus.FINISHED)
     }
 
-    fun getActiveByPlayerId(id: String): Game {
-        return gameRepo.findByPlayersIdAndStatusOrStatus(id, GameStatus.ACTIVE, GameStatus.FINISHED)
+    fun getActiveForAdmin(adminId: String): List<Game> {
+        return gameRepo.findByAdminIdAndStatusOrStatus(adminId, GameStatus.ACTIVE, GameStatus.FINISHED)
     }
 
     fun finish(id: String) {
         val game = get(id)
-        if( game.status == GameStatus.ACTIVE) throw InvalidSatusException("Can only finish a game that is in STARTED state not ${game.status}")
+        if( game.status == GameStatus.ACTIVE) throw InvalidStatusException("Can only finish a game that is in STARTED state not ${game.status}")
         game.status = GameStatus.COMPLETED
         save(game)
     }
 
     fun cancel(id: String) {
         val game = get(id)
-        if( game.status == GameStatus.CANCELLED) throw InvalidSatusException("Game is already in CANCELLED state")
+        if( game.status == GameStatus.CANCELLED) throw InvalidStatusException("Game is already in CANCELLED state")
         game.status = GameStatus.CANCELLED
         save(game)
     }
 
-    fun replay(currentGame: Game, playerId: String): Game {
+    fun replay(currentGame: Game, playerId: String) {
 
         val timestamp = LocalDateTime.now()
 
@@ -172,13 +132,13 @@ class GameService(
         if (oldPlayers.size == 6) {
             val teamIds = listOf(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
             oldPlayers.forEachIndexed { index, player ->
-                players.add(Player(id = player.id, displayName = player.displayName, teamId = teamIds[3 % index]))
+                players.add(Player(id = player.id, seatNumber = index + 1, teamId = teamIds[3 % index]))
             }
 
         } else {
-            oldPlayers.forEach { player ->
+            oldPlayers.forEachIndexed { index, player ->
                 // For an individual game set the team ID == email
-                players.add(Player(id = player.id, displayName = player.displayName, teamId = player.displayName))
+                players.add(Player(id = player.id, seatNumber = index + 1, teamId = player.id))
             }
         }
 
@@ -194,6 +154,7 @@ class GameService(
                 timestamp = timestamp,
                 name = currentGame.name,
                 status = GameStatus.ACTIVE,
+                adminId = currentGame.adminId,
                 players = players,
                 currentRound = round,
                 emailMessage = currentGame.emailMessage)
@@ -202,14 +163,11 @@ class GameService(
         game = save(game)
 
         // 7. Publish updated game
-        publishGame(Pair(game, null), playerId, EventType.REPLAY)
-
-        // 8. Return the game
-        return game
+        publishGame(game = game, type = EventType.REPLAY)
     }
 
     // Deal a new round
-    fun deal(game: Game, playerId: String): Game {
+    fun deal(game: Game, playerId: String) {
 
         // 1. Check if they are the dealer
         val dealer = game.currentRound.dealerId
@@ -225,20 +183,18 @@ class GameService(
         // 4. Deal the cards
         val deck =  deckService.getDeck(game.id)
         for(x in 0 until 5) {
-            game.players.forEach {
-                it.cards = it.cards.plus(popFromDeck(deck))
-            }
+            game.players.forEach { player -> player.cards = player.cards.plus(popFromDeck(deck)) }
         }
         deckService.save(deck)
 
-        // 5. Save the game
+        // 5. Reset bought cards
+        game.players.forEach { player -> player.cardsBought = null }
+
+        // 6. Save the game
         save(game)
 
-        // 6. Publish updated game
-        publishGame(Pair(game, null), playerId, EventType.DEAL)
-
-        // 7. Return the game
-        return game
+        // 7. Publish updated game
+        publishGame(game = game, type = EventType.DEAL)
     }
 
     private fun popFromDeck(deck: Deck): Card {
@@ -246,7 +202,7 @@ class GameService(
         return deck.cards.pop()
     }
 
-    fun call(gameId: String, playerId: String, call: Int): Game {
+    fun call(gameId: String, playerId: String, call: Int) {
         // 1. Validate call value
         if(!VALID_CALL.contains(call)) throw InvalidOperationException("Call value $call is invalid")
 
@@ -260,13 +216,13 @@ class GameService(
         // 4. Get current hand
         val currentHand = currentRound.currentHand
 
-        // 4. Get myself
+        // 5. Get myself
         val me = findPlayer(game.players, currentHand.currentPlayerId)
 
-        // 5. Check they are the next player
+        // 6. Check they are the next player
         if (currentHand.currentPlayerId != playerId) throw InvalidOperationException("It's not your go!")
 
-        // 6. Check if call value is valid i.e. > all other calls
+        // 7. Check if call value is valid i.e. > all other calls
         if  (currentRound.dealerSeeingCall) {
             me.call = call
         } else if (call != 0) {
@@ -276,10 +232,11 @@ class GameService(
             else throw InvalidOperationException("Call must be higher than ${currentCaller.call}")
         }
 
-        // 7. Update my call
+        // 8. Update my call
         game.players.forEach { if (it.id == me.id) it.call = me.call }
 
-        // 8. Set next player/round status
+        // 9. Set next player/round status
+        var type = EventType.CALL
         if (call == 30) {
             logger.info("Jink called by $me")
             if (currentHand.currentPlayerId == currentRound.dealerId) {
@@ -300,15 +257,16 @@ class GameService(
             if (caller.call == 0 && me.call == 0) {
                 logger.info("Nobody called anything. Will have to re-deal.")
                 completeRound(game)
+                type = EventType.ROUND_COMPLETED
             } else if (me.call == caller.call && me.id != caller.id) {
                 logger.info("Dealer saw a call. Go back to caller.")
                 currentHand.currentPlayerId = caller.id
                 currentRound.dealerSeeingCall = true
             } else if (caller.call == 10) {
-                logger.info("Can go on 10")
+                logger.info("Can't go 10")
                 completeRound(game)
-            }
-            else {
+                type = EventType.ROUND_COMPLETED
+            } else {
                 logger.info("Successful call $caller")
                 currentRound.status = RoundStatus.CALLED
                 currentRound.goerId = caller.id
@@ -318,14 +276,14 @@ class GameService(
         } else if (currentRound.dealerSeeingCall) {
             logger.info("This player was taken by the dealer.")
             if (me.call == 0) {
-                logger.info("${me.displayName} let the dealer go")
+                logger.info("${me.id} let the dealer go")
                 currentRound.status = RoundStatus.CALLED
                 currentRound.goerId = currentRound.dealerId
                 currentHand.currentPlayerId = currentRound.dealerId
             } else {
                 val caller = game.players.maxBy { it.call } ?: throw Exception("This should never happen")
                 if (caller.id != me.id) throw InvalidOperationException("Invalid call")
-                logger.info("${me.displayName} has raised the call")
+                logger.info("${me.id} has raised the call")
                 currentHand.currentPlayerId = currentRound.dealerId
                 currentRound.dealerSeeingCall = false
             }
@@ -334,16 +292,14 @@ class GameService(
             currentHand.currentPlayerId = nextPlayer(game.players, me.id).id
         }
 
-        // 9. Save game
+        // 10. Save game
         save(game)
 
-        // 10. Publish updated game
-        publishGame(Pair(game, null), me.id, EventType.CALL)
-
-        return getGameForPlayer(game, me.id)
+        // 11. Publish updated game
+        publishGame(game = game, type = type)
     }
 
-    fun chooseFromDummy(gameId: String, playerId: String, selectedCards: List<Card>, suit: Suit): Game {
+    fun chooseFromDummy(gameId: String, playerId: String, selectedCards: List<Card>, suit: Suit) {
         // 1. Get Game
         val game = get(gameId)
 
@@ -385,12 +341,10 @@ class GameService(
         save(game)
 
         // 11. Publish updated game
-        publishGame(Pair(game, null), me.id, EventType.CHOOSE_FROM_DUMMY)
-
-        return getGameForPlayer(game, me.id)
+        publishGame(game = game, type = EventType.CHOOSE_FROM_DUMMY)
     }
 
-    fun buyCards(gameId: String, playerId: String, selectedCards: List<Card>): Game {
+    fun buyCards(gameId: String, playerId: String, selectedCards: List<Card>) {
         // 1. Get Game
         val game = get(gameId)
 
@@ -421,7 +375,10 @@ class GameService(
         val deck = deckService.getDeck(gameId)
         var newCards = selectedCards
         for(x in 0 until 5 - selectedCards.size) newCards = newCards.plus(popFromDeck(deck))
-        game.players.forEach { if (it.id == playerId) it.cards = newCards }
+        game.players.forEach { player -> if (player.id == playerId) {
+            player.cards = newCards
+            player.cardsBought = 5 - selectedCards.size
+        } }
         deckService.save(deck)
 
         // 9. Set next player
@@ -435,12 +392,10 @@ class GameService(
         save(game)
 
         // 10. Publish updated game
-        publishGame(Pair(game, "${me.displayName} bought ${5 - selectedCards.size} cards"), me.id, EventType.BUY_CARDS)
-
-        return getGameForPlayer(game, me.id)
+        publishGame(game = game, type = EventType.BUY_CARDS)
     }
 
-    fun playCard(gameId: String, playerId: String, myCard: Card): Game {
+    fun playCard(gameId: String, playerId: String, myCard: Card) {
         // 1. Get Game
         val game = get(gameId)
 
@@ -471,8 +426,8 @@ class GameService(
             throw InvalidOperationException("Must follow suit!")
 
         // 8. Play the card
-        game.players.forEach {
-            if (it.id == me.id) it.cards = it.cards.minus(myCard)
+        game.players.forEach { player ->
+            if (player.id == me.id) player.cards = player.cards.minus(myCard)
         }
         currentHand.playedCards = currentHand.playedCards.plus(Pair(me.id, myCard))
 
@@ -487,7 +442,7 @@ class GameService(
 
             // Publish the game and wait 4 seconds. This is to allow time to see the card
             // TODO Use a computable future or something rather than stopping the thread
-            publishGame(Pair(game, null), null, EventType.LAST_CARD_PLAYED)
+            publishGame(game = game, type = EventType.LAST_CARD_PLAYED)
             Thread.sleep(4000)
 
             if (currentRound.completedHands.size >= 4) {
@@ -523,29 +478,32 @@ class GameService(
         save(game)
 
         // 11. Publish updated game
-        publishGame(Pair(game, null), me.id, type)
-
-        return getGameForPlayer(game, me.id)
+        publishGame(game = game, type = type)
     }
 
-    fun getGameForPlayer(game: Game, playerId: String): Game {
-        // TODO Make this work without modifying the object
-        // 1. Create a copy of the game object
-        // val gameModified = game.copy()
-        //        val players = gameModified.players.toMutableList()
-        //
-        //        players.forEach {
-        //            it.cards = it.cards.toMutableList()
-        //        }
-        //
-        //        logger.info("Before: $players")
-        //        // 2. Filter out cards of other players
-        //        players.forEach { if (!(it.id == playerId || (it.id == "dummy" && playerId == round.goer?.id))) it.cards = emptyList() }
-        //        gameModified.players = players
-        //
-        // logger.info("After: $players")
-        // return gameModified
-        return game
+    fun parsePlayerGameState(game: Game, playerId: String): PlayerGameState {
+
+        // 1. Find player
+        val me = game.players.find { player -> player.id == playerId } ?: throw NotFoundException("Can't find player")
+
+        // 2. Find dummy
+        val dummy = (game.currentRound.goerId == playerId).let {
+            game.players.find { player -> player.id == "dummy" }
+        }
+
+        // 3. Get max call
+        val highestCaller = game.players.maxBy { player -> player.call }
+
+        // 5. Return player's game state
+        return PlayerGameState(
+                me = me,
+                cards = me.cards,
+                status = game.status,
+                dummy = dummy?.cards,
+                round = game.currentRound,
+                maxCall = highestCaller?.call ?: 0,
+                playerProfiles = game.players.filter { p -> p.id != "dummy" }
+        )
     }
 
     private fun completeHand(game: Game): Game {
@@ -583,17 +541,22 @@ class GameService(
                 number = game.currentRound.number + 1,
                 dealerId = nextDealerId,
                 currentHand = nextHand, status = RoundStatus.CALLING)
+
+        // 3. Clear cards
+        game.players.forEach { player ->
+            player.cards = emptyList()
+        }
+
         return game
     }
 
-    private fun publishGame(payload: Pair<Game, String?>, callerId: String?, type: EventType) {
+    private fun publishGame(game: Game, type: EventType) {
 
-        payload.first.players.forEach {player ->
-            if (callerId == null || (player.id != callerId && player.id != "dummy")) {
-                publishService.publishContent(recipient = player.id,
+        game.players.forEach { player ->
+            if (player.id != "dummy") {
+                publishService.publishContent(recipient = "${player.id}${game.id!!}",
                         topic = "/game",
-                        content = Pair(getGameForPlayer(game = payload.first, playerId = player.id), payload.second),
-                        gameId = payload.first.id!!,
+                        content = parsePlayerGameState(game = game, playerId = player.id),
                         contentType = type)
             }
         }
@@ -758,7 +721,7 @@ class GameService(
         val dealer = players.find { it.id == dealerId }
         val playerStack = Stack<Player>()
         playerStack.push(dealer)
-        playerStack.push(Player("dummy","dummy", teamId = "dummy"))
+        playerStack.push(Player(id = "dummy", seatNumber = 0, teamId = "dummy"))
         var currentIndex = playersSansDummy.indexOf(dealer)
         for(x in 0 until playersSansDummy.size - 1) {
             currentIndex = if(currentIndex < 1)

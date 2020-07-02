@@ -2,32 +2,52 @@ package ie.daithi.cards.service
 
 import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.web.exceptions.NotFoundException
+import ie.daithi.cards.model.AppUser
 import org.apache.logging.log4j.LogManager
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
-import java.lang.RuntimeException
 
 @Service
 class AppUserService (
         private val appUserRepo: AppUserRepo
-): UserDetailsService {
+) {
 
-    override fun loadUserByUsername(username: String): UserDetails {
-        val appUser = appUserRepo.findById(username)
-        if (appUser.isEmpty)
-            throw NotFoundException("User not found")
+    fun getUser(userId: String): AppUser {
+        val appUser = appUserRepo.findById(userId)
+        if (appUser.isEmpty) throw NotFoundException("AppUser($userId) not found")
+        return appUser.get()
+    }
 
-        if (appUser.get().authorities == null)
-            throw RuntimeException("appuser not found")
+    fun getUsers(players: List<String>): List<AppUser> {
+        return appUserRepo.findByIdIn(players)
+    }
 
-        val authorities = arrayListOf<GrantedAuthority>()
-        appUser.get().authorities!!.forEach { authority -> authorities.add(SimpleGrantedAuthority(authority.toString())) }
+    fun getAllUsers(): List<AppUser> {
+        return appUserRepo.findAll()
+    }
 
-        return User(appUser.get().username, appUser.get().password, authorities)
+    fun exists(id: String): Boolean {
+        return appUserRepo.existsById(id)
+    }
+
+    fun updateUser(subject: String, name: String, email: String, picture: String?) {
+        // 1. Check if a user exists with this email address
+        val existingUser = appUserRepo.findOneByEmail(email)
+
+        val appUser = if (existingUser.isPresent)
+            AppUser(id = existingUser.get().id, subject = subject, name = name, email = email, picture = picture)
+        else
+            AppUser(subject = subject, name = name, email = email, picture = picture)
+
+        // 2. Save record
+        appUserRepo.save(appUser)
+    }
+
+    fun existsBySubject(subject: String): Boolean {
+        return appUserRepo.existsBySubject(subject)
+    }
+
+    fun getUserBySubject(subject: String): AppUser {
+        return appUserRepo.findOneBySubject(subject)
     }
 
     companion object {
