@@ -37,7 +37,7 @@ repositories {
 }
 
 group = "ie.daithi.cards"
-version = "1.0.0-SNAPSHOT"
+version = "1.2.0-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_13
 
 description = "api"
