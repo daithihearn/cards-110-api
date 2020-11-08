@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.FileInputStream
+import java.util.*
 
 buildscript {
 	val kotlinVersion = "1.3.72"
@@ -36,8 +38,11 @@ repositories {
 	}
 }
 
+val versionFile = Properties()
+versionFile.load(FileInputStream(".env"))
+
 group = "ie.daithi.cards"
-version = "1.2.0-SNAPSHOT"
+version = "${versionFile.getProperty("CARDS_API_VERSION")}"
 java.sourceCompatibility = JavaVersion.VERSION_13
 
 description = "api"
