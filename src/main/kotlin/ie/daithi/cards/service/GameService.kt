@@ -1,5 +1,6 @@
 package ie.daithi.cards.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import ie.daithi.cards.enumeration.Card
 import ie.daithi.cards.enumeration.GameStatus
 import ie.daithi.cards.enumeration.RoundStatus
@@ -21,7 +22,8 @@ import java.util.*
 class GameService(
         private val gameRepo: GameRepo,
         private val deckService: DeckService,
-        private val publishService: PublishService
+        private val publishService: PublishService,
+        private val objectMapper: ObjectMapper
 ) {
     @Transactional
     fun create(adminId: String, name: String, playerIds: List<String>): Game {
@@ -402,6 +404,9 @@ class GameService(
 
         // 11. Publish updated game
         publishGame(game = game, type = EventType.BUY_CARDS)
+
+        // 12. Publish buy cards event
+        publishBuyCardsEvent(game, BuyCardsEvent(playerId, 5 - selectedCards.size))
     }
 
     @Transactional
@@ -568,6 +573,18 @@ class GameService(
                         topic = "/game",
                         content = parsePlayerGameState(game = game, playerId = player.id),
                         contentType = type)
+            }
+        }
+    }
+
+    private fun publishBuyCardsEvent(game: Game, buyCardsEvent: BuyCardsEvent) {
+
+        game.players.forEach { player ->
+            if (player.id != "dummy" && player.id != buyCardsEvent.playerId) {
+                publishService.publishContent(recipient = "${player.id}${game.id!!}",
+                        topic = "/game",
+                        content = buyCardsEvent,
+                        contentType = EventType.BUY_CARDS_NOTIFICATION)
             }
         }
     }
