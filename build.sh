@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CARDS_API_VERSION=$(sed -n 's/^ISSUER_VERSION=//p' .env)
+CARDS_API_VERSION=$(sed -n 's/^CARDS_API_VERSION=//p' .env)
 
 echo "
 1. Building jar cards-110-api"
