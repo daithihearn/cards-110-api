@@ -12,6 +12,7 @@ import ie.daithi.cards.web.exceptions.NotFoundException
 import ie.daithi.cards.web.model.enums.EventType
 import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.util.*
@@ -22,6 +23,7 @@ class GameService(
         private val deckService: DeckService,
         private val publishService: PublishService
 ) {
+    @Transactional
     fun create(adminId: String, name: String, playerIds: List<String>): Game {
         logger.info("Attempting to start a 110")
 
@@ -98,6 +100,7 @@ class GameService(
         return gameRepo.findByAdminIdAndStatusOrStatus(adminId, GameStatus.ACTIVE, GameStatus.FINISHED)
     }
 
+    @Transactional
     fun finish(id: String) {
         val game = get(id)
         if( game.status == GameStatus.ACTIVE) throw InvalidStatusException("Can only finish a game that is in STARTED state not ${game.status}")
@@ -105,6 +108,7 @@ class GameService(
         save(game)
     }
 
+    @Transactional
     fun cancel(id: String) {
         val game = get(id)
         if( game.status == GameStatus.CANCELLED) throw InvalidStatusException("Game is already in CANCELLED state")
@@ -112,6 +116,7 @@ class GameService(
         save(game)
     }
 
+    @Transactional
     fun replay(currentGame: Game, playerId: String) {
 
         val timestamp = LocalDateTime.now()
@@ -166,6 +171,7 @@ class GameService(
         publishGame(game = game, type = EventType.REPLAY)
     }
 
+    @Transactional
     // Deal a new round
     fun deal(game: Game, playerId: String) {
 
@@ -202,6 +208,7 @@ class GameService(
         return deck.cards.pop()
     }
 
+    @Transactional
     fun call(gameId: String, playerId: String, call: Int) {
         // 1. Validate call value
         if(!VALID_CALL.contains(call)) throw InvalidOperationException("Call value $call is invalid")
@@ -299,6 +306,7 @@ class GameService(
         publishGame(game = game, type = type)
     }
 
+    @Transactional
     fun chooseFromDummy(gameId: String, playerId: String, selectedCards: List<Card>, suit: Suit) {
         // 1. Get Game
         val game = get(gameId)
@@ -344,6 +352,7 @@ class GameService(
         publishGame(game = game, type = EventType.CHOOSE_FROM_DUMMY)
     }
 
+    @Transactional
     fun buyCards(gameId: String, playerId: String, selectedCards: List<Card>) {
         // 1. Get Game
         val game = get(gameId)
@@ -388,13 +397,14 @@ class GameService(
         }
         else nextPlayer(game.players, me.id).id
 
-        // 9. Save game
+        // 10. Save game
         save(game)
 
-        // 10. Publish updated game
+        // 11. Publish updated game
         publishGame(game = game, type = EventType.BUY_CARDS)
     }
 
+    @Transactional
     fun playCard(gameId: String, playerId: String, myCard: Card) {
         // 1. Get Game
         val game = get(gameId)
@@ -634,7 +644,7 @@ class GameService(
         return game
     }
 
-    fun findPlayer(players: List<Player>, playerId: String): Player {
+    private fun findPlayer(players: List<Player>, playerId: String): Player {
         return players.find { it.id == playerId } ?: throw NotFoundException("Can't find the player")
     }
 
