@@ -1,6 +1,5 @@
 package ie.daithi.cards.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import ie.daithi.cards.enumeration.Card
 import ie.daithi.cards.enumeration.GameStatus
 import ie.daithi.cards.enumeration.RoundStatus
@@ -14,7 +13,6 @@ import ie.daithi.cards.web.model.enums.EventType
 import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,12 +20,11 @@ import java.util.*
 class GameService(
         private val gameRepo: GameRepo,
         private val deckService: DeckService,
-        private val publishService: PublishService,
-        private val objectMapper: ObjectMapper
+        private val publishService: PublishService
 ) {
     @Transactional
     fun create(adminId: String, name: String, playerIds: List<String>): Game {
-        logger.info("Attempting to start a 110")
+        logger.info("Attempting to start a game of 110")
 
         // 1. Validate number of players
         if (playerIds.size !in 2..6) throw InvalidOperationException("Please add 2-6 players")
@@ -599,7 +596,7 @@ class GameService(
         return game.players
     }
 
-    private fun calculateScoresForRound(round: Round, players: List<Player>): MutableMap<String, Int> {
+    fun calculateScoresForRound(round: Round, players: List<Player>): MutableMap<String, Int> {
 
         var bestCard: Pair<Player, Card>? = null
         val scores: MutableMap<String, Int> = mutableMapOf()
@@ -684,7 +681,7 @@ class GameService(
 
         // 1. Was a suit or wild card played? If not set the lead out card as the suit
         val activeSuit  = if (currentHand.playedCards.filter { it.value.suit == suit || it.value.suit == Suit.WILD }.isEmpty())
-            currentHand.playedCards[players[0].id]?.suit
+            currentHand.leadOut!!.suit
         else suit
 
         logger.info("Active suit is: $activeSuit")
@@ -794,8 +791,7 @@ class GameService(
     }
 
     companion object {
-        private val logger = LogManager.getLogger(this::class.java)
-        private val secureRandom = SecureRandom()
+        private val logger = LogManager.getLogger(GameService::class.java)
         private val VALID_CALL = listOf(0, 10, 15, 20, 25, 30)
     }
 

@@ -80,7 +80,17 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
 	implementation("org.apache.commons:commons-text:1.8")
 
+	//Test
+	testImplementation("io.mockk:mockk:1.10.2")
 
+
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
+	testLogging {
+		events("passed", "skipped", "failed")
+	}
 }
 
 tasks.withType<KotlinCompile> {
