@@ -1,4 +1,4 @@
-FROM openjdk:13-alpine
+FROM openjdk:14-alpine
 
 ARG VERSION
 ENV API_VERSION $VERSION
