@@ -49,9 +49,9 @@ class MongoDbConfig(
     @Bean
     fun mongoClient(): MongoClient {
         return when {
-            env.acceptsProfiles(Profiles.of("development")) -> MongoClients.create(this.getTlsSettings())
+            env.acceptsProfiles(Profiles.of("prod")) -> MongoClients.create(this.getTlsSettings())
             env.acceptsProfiles(Profiles.of("local")) -> MongoClients.create(mongoUri)
-            else -> throw RuntimeException("A spring profile of either 'local' or 'development' must be set")
+            else -> throw RuntimeException("A spring profile of either 'local' or 'prod' must be set")
         }
     }
 
@@ -114,7 +114,7 @@ class MongoDbConfig(
         val keyManagerFactory: KeyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
         keyManagerFactory.init(keyStore, password.toCharArray())
 
-        val sslContext = SSLContext.getInstance("TLS")
+        val sslContext = SSLContext.getInstance("TLSv1.2")
         sslContext.init(keyManagerFactory.keyManagers, null, null)
 
         return sslContext
