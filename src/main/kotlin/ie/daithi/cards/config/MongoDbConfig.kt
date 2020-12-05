@@ -34,7 +34,7 @@ import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 
 @Configuration
-@EnableMongoRepositories(basePackages = ["ie.deloitte.eduscrypt.repositories"])
+@EnableMongoRepositories(basePackages = ["ie.daithi.cards"])
 class MongoDbConfig(
         @Value("\${spring.data.mongodb.uri}") private val mongoUri: String,
         @Value("\${spring.data.mongodb.database}") private val mongoDbName: String,
