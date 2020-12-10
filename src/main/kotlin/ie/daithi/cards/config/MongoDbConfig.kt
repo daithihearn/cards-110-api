@@ -49,9 +49,9 @@ class MongoDbConfig(
     @Bean
     fun mongoClient(): MongoClient {
         return when {
-            env.acceptsProfiles(Profiles.of("prod")) -> MongoClients.create(this.getTlsSettings())
-            env.acceptsProfiles(Profiles.of("local")) -> MongoClients.create(mongoUri)
-            else -> throw RuntimeException("A spring profile of either 'local' or 'prod' must be set")
+            env.acceptsProfiles(Profiles.of("mongo-auth-x509")) -> MongoClients.create(this.getTlsSettings())
+            env.acceptsProfiles(Profiles.of("mongo-auth-password")) -> MongoClients.create(mongoUri)
+            else -> throw RuntimeException("A spring profile of either 'mongo-auth-x509' or 'mongo-auth-password' must be set")
         }
     }
 
@@ -108,8 +108,8 @@ class MongoDbConfig(
         //Create the KeyStore
         val keyStore = KeyStore.getInstance("JKS")
         keyStore.load(null)
-        keyStore.setCertificateEntry("issuer-cert", certificate)
-        keyStore.setKeyEntry("issuer-key", key, password.toCharArray(), arrayOf(certificate))
+        keyStore.setCertificateEntry("cardsUser-cert", certificate)
+        keyStore.setKeyEntry("cardsUser-key", key, password.toCharArray(), arrayOf(certificate))
 
         val keyManagerFactory: KeyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
         keyManagerFactory.init(keyStore, password.toCharArray())
