@@ -179,26 +179,31 @@ class GameService(
         if (dealer != playerId)
             throw InvalidOperationException("Player $playerId is not the dealer")
 
-        // 2. Order the hands. Dummy second last, dealer last
+        // 2. Check if can deal
+        if (game.players.first().cards.isNotEmpty())
+            throw InvalidOperationException("Cards have already been dealt")
+
+
+        // 3. Order the hands. Dummy second last, dealer last
         game.players = orderPlayersAtStartOfGame(dealer, game.players)
 
-        // 3. Shuffle
+        // 4. Shuffle
         deckService.shuffle(gameId = game.id!!)
 
-        // 4. Deal the cards
+        // 5. Deal the cards
         val deck =  deckService.getDeck(game.id)
         for(x in 0 until 5) {
             game.players.forEach { player -> player.cards = player.cards.plus(popFromDeck(deck)) }
         }
         deckService.save(deck)
 
-        // 5. Reset bought cards
+        // 6. Reset bought cards
         game.players.forEach { player -> player.cardsBought = null }
 
-        // 6. Save the game
+        // 7. Save the game
         save(game)
 
-        // 7. Publish updated game
+        // 8. Publish updated game
         publishGame(game = game, type = EventType.DEAL)
     }
 
