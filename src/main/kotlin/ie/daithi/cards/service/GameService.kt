@@ -237,7 +237,7 @@ class GameService(
         if  (currentRound.dealerSeeingCall) {
             me.call = call
         } else if (call != 0) {
-            val currentCaller = game.players.maxBy { it.call } ?: throw Exception("Can't find caller")
+            val currentCaller = game.players.maxByOrNull { it.call } ?: throw Exception("Can't find caller")
             if (currentHand.currentPlayerId == currentRound.dealerId && call >= currentCaller.call) me.call = call
             else if (call > currentCaller.call) me.call = call
             else throw InvalidOperationException("Call must be higher than ${currentCaller.call}")
@@ -263,7 +263,7 @@ class GameService(
 
             logger.info("Everyone has called")
 
-            val caller = game.players.maxBy { it.call } ?: throw Exception("This should never happen")
+            val caller = game.players.maxByOrNull { it.call } ?: throw Exception("This should never happen")
 
             if (caller.call == 0 && me.call == 0) {
                 logger.info("Nobody called anything. Will have to re-deal.")
@@ -292,7 +292,7 @@ class GameService(
                 currentRound.goerId = currentRound.dealerId
                 currentHand.currentPlayerId = currentRound.dealerId
             } else {
-                val caller = game.players.maxBy { it.call } ?: throw Exception("This should never happen")
+                val caller = game.players.maxByOrNull { it.call } ?: throw Exception("This should never happen")
                 if (caller.id != me.id) throw InvalidOperationException("Invalid call")
                 logger.info("${me.id} has raised the call")
                 currentHand.currentPlayerId = currentRound.dealerId
@@ -469,13 +469,9 @@ class GameService(
                 calculateScores(game)
 
                 // Check if game is over
-                game.players.forEach {
-                    if (it.score >= 110) {
-                        game.status = GameStatus.FINISHED
-                    }
-                }
-                type = if (game.status == GameStatus.FINISHED) {
+                type = if (isGameOver(game.players)) {
                     logger.info("Game is over.")
+                    game.status = GameStatus.FINISHED
                     EventType.GAME_OVER
                 } else {
                     logger.info("Game isn't over yet. Starting a new round")
@@ -498,6 +494,10 @@ class GameService(
         publishGame(game = game, type = type)
     }
 
+    fun isGameOver(players: List<Player>): Boolean {
+        return players.maxOf { player -> player.score } >= 110
+    }
+
     fun parsePlayerGameState(game: Game, playerId: String): PlayerGameState {
 
         // 1. Find player
@@ -509,7 +509,7 @@ class GameService(
         }
 
         // 3. Get max call
-        val highestCaller = game.players.maxBy { player -> player.call }
+        val highestCaller = game.players.maxByOrNull { player -> player.call }
 
         // 5. Return player's game state
         return PlayerGameState(
@@ -692,8 +692,8 @@ class GameService(
         logger.info("Active suit is: $activeSuit")
 
         // 2. Find winning card
-        val winningCard = if (activeSuit == suit) currentHand.playedCards.filter { it.value.suit == activeSuit || it.value.suit == Suit.WILD }.maxBy { it.value.value }
-        else currentHand.playedCards.filter { it.value.suit == activeSuit }.maxBy { it.value.coldValue }
+        val winningCard = if (activeSuit == suit) currentHand.playedCards.filter { it.value.suit == activeSuit || it.value.suit == Suit.WILD }.maxByOrNull { it.value.value }
+        else currentHand.playedCards.filter { it.value.suit == activeSuit }.maxByOrNull { it.value.coldValue }
         winningCard?: throw InvalidOperationException("Can't find the winning card")
 
         logger.info("Winning card is: $winningCard")
@@ -735,12 +735,6 @@ class GameService(
             return players[currentIndex + 1]
         }
         return players[0]
-    }
-
-    private fun previousPlayer(players: List<Player>, currentPlayerId: String): Player {
-        val currentIndex = players.indexOfFirst { it.id == currentPlayerId }
-        if (currentIndex == 0) return players.last()
-        return players[currentIndex + 1]
     }
 
     private fun orderPlayersAtStartOfGame(dealerId: String, players: List<Player>): List<Player> {

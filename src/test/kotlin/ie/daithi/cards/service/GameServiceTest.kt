@@ -3,6 +3,7 @@ package ie.daithi.cards.service
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.*
 import ie.daithi.cards.model.Game
+import ie.daithi.cards.model.Player
 import ie.daithi.cards.repositories.GameRepo
 import io.mockk.mockk
 import org.junit.jupiter.api.Nested
@@ -191,6 +192,85 @@ class GameServiceTest {
             assert(response["player2"] == 5)
             assert(response["player3"] == 20)
             assert(response["player4"] == 5)
+        }
+    }
+
+    @Nested
+    inner class IsGameOver {
+        @Test
+        fun `all elements below 110`() {
+            val players = listOf(
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 100),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+            )
+            val result = gameService.isGameOver(players)
+
+            assert(!result)
+        }
+
+        @Test
+        fun `one element equals 110`() {
+            val players = listOf(
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+            )
+            val result = gameService.isGameOver(players)
+
+            assert(result)
+        }
+
+        @Test
+        fun `one element above 110`() {
+            val players = listOf(
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 120),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+            )
+            val result = gameService.isGameOver(players)
+
+            assert(result)
+        }
+
+
+        @Test
+        fun `multiple element equals 110`() {
+            val players = listOf(
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+            )
+            val result = gameService.isGameOver(players)
+
+            assert(result)
+        }
+
+        @Test
+        fun `multiple element above 110`() {
+            val players = listOf(
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 120),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 115),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+            )
+            val result = gameService.isGameOver(players)
+
+            assert(result)
         }
     }
 }
