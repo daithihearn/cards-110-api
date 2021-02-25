@@ -677,8 +677,14 @@ class GameService(
 
 
     private fun updatePlayersScore(players: List<Player>, teamId: String, points: Int) {
-        players.forEach {
-            if(it.teamId == teamId) it.score = it.score + points
+
+        players.forEach { player ->
+            if(player.teamId == teamId) {
+                // Update Score
+                player.score = player.score + points
+                // Update Rings
+                if (points < 0) player.rings = player.rings + 1
+            }
         }
     }
 

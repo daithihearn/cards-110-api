@@ -11,5 +11,6 @@ data class Player(
         var cards: List<Card> = emptyList(),
         var cardsBought: Int? = null,
         var score: Int = 0,
+        var rings: Int = 0,
         val teamId: String
 )
