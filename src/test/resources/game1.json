@@ -1,0 +1,1034 @@
+{
+    "id": "5fb07e83b5fbcd4db9fd278e",
+    "timestamp": "2020-11-15T01:04:03.085",
+    "name": "Game 1",
+    "status": "FINISHED",
+    "adminId": "player4",
+    "players": [
+        {
+            "id": "player1",
+            "seatNumber": 1,
+            "call": 0,
+            "cardsBought": 4,
+            "score": 100,
+            "teamId": "player1"
+        },
+        {
+            "id": "player2",
+            "seatNumber": 2,
+            "call": 0,
+            "cardsBought": 3,
+            "score": 70,
+            "teamId": "player2"
+        },
+        {
+            "id": "player3",
+            "seatNumber": 3,
+            "call": 0,
+            "cardsBought": 3,
+            "score": 110,
+            "teamId": "player3"
+        },
+        {
+            "id": "player4",
+            "seatNumber": 4,
+            "call": 15,
+            "cardsBought": 4,
+            "score": -5,
+            "teamId": "player4"
+        }
+    ],
+    "currentRound": {
+        "timestamp": "2020-11-15T02:00:15.701",
+        "number": 15,
+        "dealerId": "player3",
+        "goerId": "player4",
+        "suit": "CLUBS",
+        "status": "PLAYING",
+        "currentHand": {
+            "timestamp": "2020-11-15T02:03:56.799",
+            "leadOut": "TEN_CLUBS",
+            "currentPlayerId": "player4",
+            "playedCards": {
+                "player1": "TEN_CLUBS",
+                "player2": "FIVE_DIAMONDS",
+                "player3": "TWO_SPADES",
+                "player4": "FOUR_SPADES"
+            }
+        },
+        "dealerSeeingCall": false,
+        "completedHands": [
+            {
+                "timestamp": "2020-11-15T02:00:15.701",
+                "leadOut": "QUEEN_CLUBS",
+                "currentPlayerId": "player4",
+                "playedCards": {
+                    "player1": "QUEEN_CLUBS",
+                    "player2": "SEVEN_CLUBS",
+                    "player3": "JOKER",
+                    "player4": "FIVE_CLUBS"
+                }
+            },
+            {
+                "timestamp": "2020-11-15T02:03:06.468",
+                "leadOut": "EIGHT_CLUBS",
+                "currentPlayerId": "player3",
+                "playedCards": {
+                    "player4": "EIGHT_CLUBS",
+                    "player1": "TWO_CLUBS",
+                    "player2": "KING_CLUBS",
+                    "player3": "JACK_CLUBS"
+                }
+            },
+            {
+                "timestamp": "2020-11-15T02:03:23.719",
+                "leadOut": "TEN_SPADES",
+                "currentPlayerId": "player2",
+                "playedCards": {
+                    "player3": "TEN_SPADES",
+                    "player4": "THREE_SPADES",
+                    "player1": "NINE_CLUBS",
+                    "player2": "SIX_CLUBS"
+                }
+            },
+            {
+                "timestamp": "2020-11-15T02:03:42.564",
+                "leadOut": "FOUR_CLUBS",
+                "currentPlayerId": "player1",
+                "playedCards": {
+                    "player2": "FOUR_CLUBS",
+                    "player3": "TWO_DIAMONDS",
+                    "player4": "EIGHT_DIAMONDS",
+                    "player1": "ACE_HEARTS"
+                }
+            }
+        ]
+    },
+    "completedRounds": [
+        {
+            "timestamp": "2020-11-15T01:04:03.085",
+            "number": 1,
+            "dealerId": "player1",
+            "goerId": "player4",
+            "suit": "DIAMONDS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:08:39.134",
+                "leadOut": "JOKER",
+                "currentPlayerId": "player4",
+                "playedCards": {
+                    "player1": "JOKER",
+                    "player2": "NINE_HEARTS",
+                    "player3": "ACE_SPADES",
+                    "player4": "NINE_DIAMONDS"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:04:03.085",
+                    "leadOut": "NINE_CLUBS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "NINE_CLUBS",
+                        "player2": "TEN_DIAMONDS",
+                        "player3": "NINE_SPADES",
+                        "player4": "ACE_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:07:37.628",
+                    "leadOut": "FIVE_DIAMONDS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "FIVE_DIAMONDS",
+                        "player1": "KING_DIAMONDS",
+                        "player2": "THREE_DIAMONDS",
+                        "player3": "FOUR_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:07:51.96",
+                    "leadOut": "QUEEN_HEARTS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "QUEEN_HEARTS",
+                        "player1": "SEVEN_CLUBS",
+                        "player2": "TWO_HEARTS",
+                        "player3": "JACK_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:08:19.372",
+                    "leadOut": "ACE_HEARTS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "ACE_HEARTS",
+                        "player1": "JACK_DIAMONDS",
+                        "player2": "TWO_SPADES",
+                        "player3": "THREE_SPADES"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:08:45.78",
+            "number": 2,
+            "dealerId": "player2",
+            "goerId": "player4",
+            "suit": "CLUBS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:14:29.193",
+                "leadOut": "KING_CLUBS",
+                "currentPlayerId": "player3",
+                "playedCards": {
+                    "player4": "KING_CLUBS",
+                    "player1": "SEVEN_CLUBS",
+                    "player2": "KING_SPADES",
+                    "player3": "NINE_SPADES"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:08:45.78",
+                    "leadOut": "SIX_HEARTS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "SIX_HEARTS",
+                        "player2": "ACE_CLUBS",
+                        "player3": "NINE_HEARTS",
+                        "player4": "ACE_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:12:40.913",
+                    "leadOut": "FIVE_CLUBS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "FIVE_CLUBS",
+                        "player1": "TEN_CLUBS",
+                        "player2": "FOUR_CLUBS",
+                        "player3": "THREE_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:13:16.79",
+                    "leadOut": "FIVE_HEARTS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "FIVE_HEARTS",
+                        "player1": "FIVE_SPADES",
+                        "player2": "TEN_SPADES",
+                        "player3": "QUEEN_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:14:01.485",
+                    "leadOut": "QUEEN_DIAMONDS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "QUEEN_DIAMONDS",
+                        "player4": "SIX_CLUBS",
+                        "player1": "QUEEN_SPADES",
+                        "player2": "KING_DIAMONDS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:14:35.952",
+            "number": 3,
+            "dealerId": "player3",
+            "goerId": "player4",
+            "suit": "DIAMONDS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:17:58.708",
+                "leadOut": "JACK_DIAMONDS",
+                "currentPlayerId": "player3",
+                "playedCards": {
+                    "player4": "JACK_DIAMONDS",
+                    "player1": "ACE_HEARTS",
+                    "player2": "KING_SPADES",
+                    "player3": "THREE_HEARTS"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:14:35.952",
+                    "leadOut": "SEVEN_CLUBS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "SEVEN_CLUBS",
+                        "player2": "KING_DIAMONDS",
+                        "player3": "TWO_HEARTS",
+                        "player4": "JACK_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:16:03.207",
+                    "leadOut": "TEN_CLUBS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "TEN_CLUBS",
+                        "player3": "SEVEN_DIAMONDS",
+                        "player4": "NINE_DIAMONDS",
+                        "player1": "QUEEN_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:17:25.978",
+                    "leadOut": "FIVE_DIAMONDS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "FIVE_DIAMONDS",
+                        "player2": "JOKER",
+                        "player3": "ACE_DIAMONDS",
+                        "player4": "TWO_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:17:44.313",
+                    "leadOut": "FOUR_SPADES",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "FOUR_SPADES",
+                        "player2": "FIVE_SPADES",
+                        "player3": "SIX_SPADES",
+                        "player4": "FOUR_DIAMONDS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:18:05.427",
+            "number": 4,
+            "dealerId": "player4",
+            "goerId": "player4",
+            "suit": "HEARTS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:21:27.271",
+                "leadOut": "TEN_HEARTS",
+                "currentPlayerId": "player4",
+                "playedCards": {
+                    "player1": "TEN_HEARTS",
+                    "player2": "KING_SPADES",
+                    "player3": "JOKER",
+                    "player4": "QUEEN_HEARTS"
+                }
+            },
+            "dealerSeeingCall": true,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:18:05.427",
+                    "leadOut": "TEN_CLUBS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "TEN_CLUBS",
+                        "player2": "EIGHT_HEARTS",
+                        "player3": "JACK_CLUBS",
+                        "player4": "NINE_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:20:29.055",
+                    "leadOut": "JACK_HEARTS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "JACK_HEARTS",
+                        "player1": "FIVE_HEARTS",
+                        "player2": "TWO_HEARTS",
+                        "player3": "KING_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:20:46.619",
+                    "leadOut": "SIX_SPADES",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "SIX_SPADES",
+                        "player2": "QUEEN_SPADES",
+                        "player3": "SIX_DIAMONDS",
+                        "player4": "SEVEN_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:21:09.569",
+                    "leadOut": "TEN_DIAMONDS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "TEN_DIAMONDS",
+                        "player1": "FOUR_HEARTS",
+                        "player2": "QUEEN_CLUBS",
+                        "player3": "QUEEN_DIAMONDS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:21:33.901",
+            "number": 5,
+            "dealerId": "player1",
+            "goerId": "player1",
+            "suit": "SPADES",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:24:57.212",
+                "leadOut": "TWO_SPADES",
+                "currentPlayerId": "player4",
+                "playedCards": {
+                    "player1": "TWO_SPADES",
+                    "player2": "KING_DIAMONDS",
+                    "player3": "THREE_HEARTS",
+                    "player4": "TWO_CLUBS"
+                }
+            },
+            "dealerSeeingCall": true,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:21:33.901",
+                    "leadOut": "SIX_DIAMONDS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "SIX_DIAMONDS",
+                        "player3": "JACK_DIAMONDS",
+                        "player4": "KING_SPADES",
+                        "player1": "ACE_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:23:40.702",
+                    "leadOut": "QUEEN_SPADES",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "QUEEN_SPADES",
+                        "player2": "EIGHT_SPADES",
+                        "player3": "FIVE_SPADES",
+                        "player4": "SEVEN_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:24:07.74",
+                    "leadOut": "FIVE_CLUBS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "FIVE_CLUBS",
+                        "player4": "ACE_HEARTS",
+                        "player1": "JACK_SPADES",
+                        "player2": "KING_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:24:37.373",
+                    "leadOut": "JOKER",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "JOKER",
+                        "player2": "FOUR_SPADES",
+                        "player3": "SIX_CLUBS",
+                        "player4": "SIX_SPADES"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:25:03.741",
+            "number": 6,
+            "dealerId": "player2",
+            "goerId": "player3",
+            "suit": "HEARTS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:28:48.143",
+                "leadOut": "NINE_HEARTS",
+                "currentPlayerId": "player3",
+                "playedCards": {
+                    "player4": "NINE_HEARTS",
+                    "player1": "KING_SPADES",
+                    "player2": "THREE_CLUBS",
+                    "player3": "QUEEN_SPADES"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:25:03.741",
+                    "leadOut": "ACE_DIAMONDS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "ACE_DIAMONDS",
+                        "player1": "THREE_DIAMONDS",
+                        "player2": "TWO_HEARTS",
+                        "player3": "THREE_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:27:34.08",
+                    "leadOut": "FIVE_HEARTS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "FIVE_HEARTS",
+                        "player4": "FOUR_HEARTS",
+                        "player1": "QUEEN_DIAMONDS",
+                        "player2": "NINE_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:28:18.703",
+                    "leadOut": "JACK_HEARTS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "JACK_HEARTS",
+                        "player4": "SEVEN_HEARTS",
+                        "player1": "SEVEN_DIAMONDS",
+                        "player2": "SIX_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:28:33.558",
+                    "leadOut": "KING_DIAMONDS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "KING_DIAMONDS",
+                        "player4": "TEN_HEARTS",
+                        "player1": "EIGHT_DIAMONDS",
+                        "player2": "SIX_DIAMONDS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:28:54.611",
+            "number": 7,
+            "dealerId": "player3",
+            "goerId": "player2",
+            "suit": "DIAMONDS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:32:22.797",
+                "leadOut": "ACE_HEARTS",
+                "currentPlayerId": "player1",
+                "playedCards": {
+                    "player2": "ACE_HEARTS",
+                    "player3": "KING_DIAMONDS",
+                    "player4": "KING_HEARTS",
+                    "player1": "SEVEN_CLUBS"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:28:54.611",
+                    "leadOut": "FOUR_SPADES",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "FOUR_SPADES",
+                        "player4": "TEN_HEARTS",
+                        "player1": "EIGHT_DIAMONDS",
+                        "player2": "NINE_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:30:58.632",
+                    "leadOut": "FIVE_DIAMONDS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "FIVE_DIAMONDS",
+                        "player3": "SEVEN_DIAMONDS",
+                        "player4": "TWO_HEARTS",
+                        "player1": "FOUR_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:31:17.991",
+                    "leadOut": "JOKER",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "JOKER",
+                        "player3": "JACK_DIAMONDS",
+                        "player4": "THREE_HEARTS",
+                        "player1": "NINE_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:31:39.435",
+                    "leadOut": "ACE_SPADES",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "ACE_SPADES",
+                        "player4": "NINE_HEARTS",
+                        "player1": "SEVEN_SPADES",
+                        "player2": "SIX_DIAMONDS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:32:29.351",
+            "number": 8,
+            "dealerId": "player4",
+            "goerId": "player4",
+            "suit": "HEARTS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:36:12.203",
+                "leadOut": "ACE_SPADES",
+                "currentPlayerId": "player3",
+                "playedCards": {
+                    "player4": "ACE_SPADES",
+                    "player1": "QUEEN_SPADES",
+                    "player2": "JACK_CLUBS",
+                    "player3": "NINE_HEARTS"
+                }
+            },
+            "dealerSeeingCall": true,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:32:29.351",
+                    "leadOut": "NINE_CLUBS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "NINE_CLUBS",
+                        "player2": "FOUR_HEARTS",
+                        "player3": "THREE_CLUBS",
+                        "player4": "SIX_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:34:41.739",
+                    "leadOut": "JACK_HEARTS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "JACK_HEARTS",
+                        "player1": "QUEEN_HEARTS",
+                        "player2": "THREE_HEARTS",
+                        "player3": "FIVE_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:34:57.097",
+                    "leadOut": "THREE_DIAMONDS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "THREE_DIAMONDS",
+                        "player4": "SEVEN_CLUBS",
+                        "player1": "EIGHT_DIAMONDS",
+                        "player2": "TEN_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:35:24.79",
+                    "leadOut": "TWO_DIAMONDS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "TWO_DIAMONDS",
+                        "player3": "SEVEN_HEARTS",
+                        "player4": "TEN_HEARTS",
+                        "player1": "KING_SPADES"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:36:19.044",
+            "number": 9,
+            "dealerId": "player1",
+            "goerId": "player2",
+            "suit": "DIAMONDS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:41:30.842",
+                "leadOut": "THREE_HEARTS",
+                "currentPlayerId": "player4",
+                "playedCards": {
+                    "player1": "THREE_HEARTS",
+                    "player2": "SIX_DIAMONDS",
+                    "player3": "KING_DIAMONDS",
+                    "player4": "EIGHT_HEARTS"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:36:19.044",
+                    "leadOut": "NINE_CLUBS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "NINE_CLUBS",
+                        "player4": "ACE_HEARTS",
+                        "player1": "KING_CLUBS",
+                        "player2": "SEVEN_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:39:58.594",
+                    "leadOut": "EIGHT_SPADES",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "EIGHT_SPADES",
+                        "player1": "ACE_DIAMONDS",
+                        "player2": "TWO_DIAMONDS",
+                        "player3": "EIGHT_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:40:36.697",
+                    "leadOut": "JACK_HEARTS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "JACK_HEARTS",
+                        "player2": "FIVE_DIAMONDS",
+                        "player3": "SEVEN_DIAMONDS",
+                        "player4": "NINE_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:41:04.942",
+                    "leadOut": "EIGHT_DIAMONDS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "EIGHT_DIAMONDS",
+                        "player3": "QUEEN_DIAMONDS",
+                        "player4": "FOUR_DIAMONDS",
+                        "player1": "JOKER"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:41:37.44",
+            "number": 10,
+            "dealerId": "player2",
+            "goerId": "player2",
+            "suit": "CLUBS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:45:32.962",
+                "leadOut": "SIX_CLUBS",
+                "currentPlayerId": "player1",
+                "playedCards": {
+                    "player2": "SIX_CLUBS",
+                    "player3": "TWO_CLUBS",
+                    "player4": "NINE_HEARTS",
+                    "player1": "KING_DIAMONDS"
+                }
+            },
+            "dealerSeeingCall": true,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:41:37.44",
+                    "leadOut": "SIX_SPADES",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "SIX_SPADES",
+                        "player4": "ACE_CLUBS",
+                        "player1": "THREE_DIAMONDS",
+                        "player2": "ACE_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:44:30.683",
+                    "leadOut": "JACK_CLUBS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "JACK_CLUBS",
+                        "player3": "NINE_CLUBS",
+                        "player4": "TWO_DIAMONDS",
+                        "player1": "FIVE_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:44:50.037",
+                    "leadOut": "JACK_DIAMONDS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "JACK_DIAMONDS",
+                        "player2": "JOKER",
+                        "player3": "NINE_DIAMONDS",
+                        "player4": "SIX_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:45:10.683",
+                    "leadOut": "KING_CLUBS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "KING_CLUBS",
+                        "player3": "THREE_CLUBS",
+                        "player4": "EIGHT_HEARTS",
+                        "player1": "QUEEN_DIAMONDS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:45:39.454",
+            "number": 11,
+            "dealerId": "player3",
+            "goerId": "player2",
+            "suit": "HEARTS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:48:18.402",
+                "leadOut": "KING_HEARTS",
+                "currentPlayerId": "player1",
+                "playedCards": {
+                    "player2": "KING_HEARTS",
+                    "player3": "JACK_DIAMONDS",
+                    "player4": "FOUR_CLUBS",
+                    "player1": "ACE_CLUBS"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:45:39.454",
+                    "leadOut": "NINE_CLUBS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "NINE_CLUBS",
+                        "player4": "TEN_CLUBS",
+                        "player1": "TEN_HEARTS",
+                        "player2": "QUEEN_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:47:23.611",
+                    "leadOut": "FIVE_HEARTS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "FIVE_HEARTS",
+                        "player3": "THREE_HEARTS",
+                        "player4": "SEVEN_CLUBS",
+                        "player1": "NINE_HEARTS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:47:42.802",
+                    "leadOut": "JACK_HEARTS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "JACK_HEARTS",
+                        "player3": "SEVEN_HEARTS",
+                        "player4": "SIX_CLUBS",
+                        "player1": "NINE_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:48:04.563",
+                    "leadOut": "JOKER",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "JOKER",
+                        "player3": "ACE_HEARTS",
+                        "player4": "NINE_DIAMONDS",
+                        "player1": "EIGHT_DIAMONDS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:48:24.992",
+            "number": 12,
+            "dealerId": "player4",
+            "goerId": "player4",
+            "suit": "CLUBS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:53:14.059",
+                "leadOut": "ACE_SPADES",
+                "currentPlayerId": "player4",
+                "playedCards": {
+                    "player1": "ACE_SPADES",
+                    "player2": "THREE_DIAMONDS",
+                    "player3": "KING_SPADES",
+                    "player4": "NINE_CLUBS"
+                }
+            },
+            "dealerSeeingCall": true,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:48:24.992",
+                    "leadOut": "SIX_HEARTS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "SIX_HEARTS",
+                        "player2": "ACE_HEARTS",
+                        "player3": "SIX_SPADES",
+                        "player4": "EIGHT_DIAMONDS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:52:05.191",
+                    "leadOut": "ACE_DIAMONDS",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "ACE_DIAMONDS",
+                        "player3": "SIX_CLUBS",
+                        "player4": "QUEEN_CLUBS",
+                        "player1": "EIGHT_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:52:44.02",
+                    "leadOut": "FIVE_CLUBS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "FIVE_CLUBS",
+                        "player1": "THREE_CLUBS",
+                        "player2": "SEVEN_CLUBS",
+                        "player3": "FOUR_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:52:56.408",
+                    "leadOut": "EIGHT_CLUBS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "EIGHT_CLUBS",
+                        "player1": "JOKER",
+                        "player2": "ACE_CLUBS",
+                        "player3": "TWO_CLUBS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:53:20.541",
+            "number": 13,
+            "dealerId": "player1",
+            "goerId": "player4",
+            "suit": "CLUBS",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T01:57:03.639",
+                "leadOut": "TWO_CLUBS",
+                "currentPlayerId": "player2",
+                "playedCards": {
+                    "player3": "TWO_CLUBS",
+                    "player4": "KING_SPADES",
+                    "player1": "SEVEN_HEARTS",
+                    "player2": "SIX_HEARTS"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:53:20.541",
+                    "leadOut": "TEN_DIAMONDS",
+                    "currentPlayerId": "player4",
+                    "playedCards": {
+                        "player1": "TEN_DIAMONDS",
+                        "player2": "SIX_SPADES",
+                        "player3": "FIVE_DIAMONDS",
+                        "player4": "TEN_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:56:02.738",
+                    "leadOut": "FIVE_CLUBS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "FIVE_CLUBS",
+                        "player1": "EIGHT_CLUBS",
+                        "player2": "NINE_CLUBS",
+                        "player3": "SEVEN_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:56:25.95",
+                    "leadOut": "NINE_SPADES",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "NINE_SPADES",
+                        "player1": "TEN_SPADES",
+                        "player2": "FOUR_SPADES",
+                        "player3": "SIX_CLUBS"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:56:45.587",
+                    "leadOut": "KING_CLUBS",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "KING_CLUBS",
+                        "player4": "QUEEN_CLUBS",
+                        "player1": "SIX_DIAMONDS",
+                        "player2": "FIVE_HEARTS"
+                    }
+                }
+            ]
+        },
+        {
+            "timestamp": "2020-11-15T01:57:10.242",
+            "number": 14,
+            "dealerId": "player2",
+            "goerId": "player3",
+            "suit": "SPADES",
+            "status": "PLAYING",
+            "currentHand": {
+                "timestamp": "2020-11-15T02:00:09.173",
+                "leadOut": "TEN_HEARTS",
+                "currentPlayerId": "player2",
+                "playedCards": {
+                    "player3": "TEN_HEARTS",
+                    "player4": "ACE_HEARTS",
+                    "player1": "TWO_HEARTS",
+                    "player2": "JACK_CLUBS"
+                }
+            },
+            "dealerSeeingCall": false,
+            "completedHands": [
+                {
+                    "timestamp": "2020-11-15T01:57:10.242",
+                    "leadOut": "SEVEN_DIAMONDS",
+                    "currentPlayerId": "player3",
+                    "playedCards": {
+                        "player4": "SEVEN_DIAMONDS",
+                        "player1": "FOUR_SPADES",
+                        "player2": "TEN_CLUBS",
+                        "player3": "QUEEN_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:59:17.386",
+                    "leadOut": "FIVE_SPADES",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "FIVE_SPADES",
+                        "player4": "ACE_SPADES",
+                        "player1": "TEN_SPADES",
+                        "player2": "NINE_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:59:32.663",
+                    "leadOut": "EIGHT_SPADES",
+                    "currentPlayerId": "player2",
+                    "playedCards": {
+                        "player3": "EIGHT_SPADES",
+                        "player4": "NINE_DIAMONDS",
+                        "player1": "EIGHT_DIAMONDS",
+                        "player2": "SEVEN_SPADES"
+                    }
+                },
+                {
+                    "timestamp": "2020-11-15T01:59:54.449",
+                    "leadOut": "KING_SPADES",
+                    "currentPlayerId": "player1",
+                    "playedCards": {
+                        "player2": "KING_SPADES",
+                        "player3": "JACK_SPADES",
+                        "player4": "QUEEN_HEARTS",
+                        "player1": "TWO_CLUBS"
+                    }
+                }
+            ]
+        }
+    ],
+    "emailMessage": ""
+}

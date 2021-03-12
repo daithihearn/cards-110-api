@@ -1,8 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.FileInputStream
+import java.util.*
 
 buildscript {
-	val kotlinVersion = "1.3.72"
-	val springBootVersion = "2.3.0.RELEASE"
+	val kotlinVersion = "1.4.10"
+	val springBootVersion = "2.3.5.RELEASE"
 	repositories {
 		mavenLocal()
 		mavenCentral()
@@ -14,10 +16,10 @@ buildscript {
 }
 
 plugins {
-    id("org.springframework.boot") version "2.3.0.RELEASE"
+    id("org.springframework.boot") version "2.3.5.RELEASE"
     id("maven-publish")
-    id("org.jetbrains.kotlin.jvm") version "1.3.72"
-	kotlin("plugin.spring") version "1.3.72"
+    id("org.jetbrains.kotlin.jvm") version "1.4.10"
+	kotlin("plugin.spring") version "1.4.10"
 }
 
 apply(plugin = "maven")
@@ -36,14 +38,17 @@ repositories {
 	}
 }
 
+val versionFile = Properties()
+versionFile.load(FileInputStream(".env"))
+
 group = "ie.daithi.cards"
-version = "1.0.0-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_13
+version = "${versionFile.getProperty("CARDS_API_VERSION")}"
+java.sourceCompatibility = JavaVersion.VERSION_14
 
 description = "api"
 
-val springBootVersion: String = "2.3.0.RELEASE"
-val swaggerVersion: String = "2.9.2"
+val springBootVersion: String = "2.3.5.RELEASE"
+val swaggerVersion: String = "3.0.0"
 
 dependencies {
 
@@ -51,9 +56,12 @@ dependencies {
 
 	// External Dependencies
 
+	implementation("org.bouncycastle:bcprov-jdk15on:1.65")
+	implementation("com.heroku.sdk:env-keystore:1.1.6")
+
 	// Kotlin dependencies
-	implementation("org.jetbrains.kotlin:kotlin-reflect:1.3.72")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.3.72")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
 
 	// Spring dependencies
 	implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
@@ -63,7 +71,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
 	implementation("org.springframework.security:spring-security-oauth2-resource-server:5.3.3.RELEASE")
 	implementation("org.springframework.security:spring-security-oauth2-jose:5.3.3.RELEASE")
-	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
 
 	// Springfox
 	implementation("io.springfox:springfox-swagger2:$swaggerVersion")
@@ -75,12 +82,23 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
 	implementation("org.apache.commons:commons-text:1.8")
 
+	//Test
+	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
+	testImplementation("io.mockk:mockk:1.10.2")
 
+
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
+	testLogging {
+		events("passed", "skipped", "failed")
+	}
 }
 
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "13"
+		jvmTarget = "14"
 	}
 }

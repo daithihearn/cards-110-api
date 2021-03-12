@@ -12,7 +12,7 @@ import ie.daithi.cards.web.exceptions.NotFoundException
 import ie.daithi.cards.web.model.enums.EventType
 import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
-import java.security.SecureRandom
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,8 +22,9 @@ class GameService(
         private val deckService: DeckService,
         private val publishService: PublishService
 ) {
+    @Transactional
     fun create(adminId: String, name: String, playerIds: List<String>): Game {
-        logger.info("Attempting to start a 110")
+        logger.info("Attempting to start a game of 110")
 
         // 1. Validate number of players
         if (playerIds.size !in 2..6) throw InvalidOperationException("Please add 2-6 players")
@@ -98,6 +99,7 @@ class GameService(
         return gameRepo.findByAdminIdAndStatusOrStatus(adminId, GameStatus.ACTIVE, GameStatus.FINISHED)
     }
 
+    @Transactional
     fun finish(id: String) {
         val game = get(id)
         if( game.status == GameStatus.ACTIVE) throw InvalidStatusException("Can only finish a game that is in STARTED state not ${game.status}")
@@ -105,6 +107,7 @@ class GameService(
         save(game)
     }
 
+    @Transactional
     fun cancel(id: String) {
         val game = get(id)
         if( game.status == GameStatus.CANCELLED) throw InvalidStatusException("Game is already in CANCELLED state")
@@ -112,6 +115,7 @@ class GameService(
         save(game)
     }
 
+    @Transactional
     fun replay(currentGame: Game, playerId: String) {
 
         val timestamp = LocalDateTime.now()
@@ -166,6 +170,7 @@ class GameService(
         publishGame(game = game, type = EventType.REPLAY)
     }
 
+    @Transactional
     // Deal a new round
     fun deal(game: Game, playerId: String) {
 
@@ -174,26 +179,31 @@ class GameService(
         if (dealer != playerId)
             throw InvalidOperationException("Player $playerId is not the dealer")
 
-        // 2. Order the hands. Dummy second last, dealer last
+        // 2. Check if can deal
+        if (game.players.first().cards.isNotEmpty())
+            throw InvalidOperationException("Cards have already been dealt")
+
+
+        // 3. Order the hands. Dummy second last, dealer last
         game.players = orderPlayersAtStartOfGame(dealer, game.players)
 
-        // 3. Shuffle
+        // 4. Shuffle
         deckService.shuffle(gameId = game.id!!)
 
-        // 4. Deal the cards
+        // 5. Deal the cards
         val deck =  deckService.getDeck(game.id)
         for(x in 0 until 5) {
             game.players.forEach { player -> player.cards = player.cards.plus(popFromDeck(deck)) }
         }
         deckService.save(deck)
 
-        // 5. Reset bought cards
+        // 6. Reset bought cards
         game.players.forEach { player -> player.cardsBought = null }
 
-        // 6. Save the game
+        // 7. Save the game
         save(game)
 
-        // 7. Publish updated game
+        // 8. Publish updated game
         publishGame(game = game, type = EventType.DEAL)
     }
 
@@ -202,6 +212,7 @@ class GameService(
         return deck.cards.pop()
     }
 
+    @Transactional
     fun call(gameId: String, playerId: String, call: Int) {
         // 1. Validate call value
         if(!VALID_CALL.contains(call)) throw InvalidOperationException("Call value $call is invalid")
@@ -226,7 +237,7 @@ class GameService(
         if  (currentRound.dealerSeeingCall) {
             me.call = call
         } else if (call != 0) {
-            val currentCaller = game.players.maxBy { it.call } ?: throw Exception("Can't find caller")
+            val currentCaller = game.players.maxByOrNull { it.call } ?: throw Exception("Can't find caller")
             if (currentHand.currentPlayerId == currentRound.dealerId && call >= currentCaller.call) me.call = call
             else if (call > currentCaller.call) me.call = call
             else throw InvalidOperationException("Call must be higher than ${currentCaller.call}")
@@ -252,7 +263,7 @@ class GameService(
 
             logger.info("Everyone has called")
 
-            val caller = game.players.maxBy { it.call } ?: throw Exception("This should never happen")
+            val caller = game.players.maxByOrNull { it.call } ?: throw Exception("This should never happen")
 
             if (caller.call == 0 && me.call == 0) {
                 logger.info("Nobody called anything. Will have to re-deal.")
@@ -281,7 +292,7 @@ class GameService(
                 currentRound.goerId = currentRound.dealerId
                 currentHand.currentPlayerId = currentRound.dealerId
             } else {
-                val caller = game.players.maxBy { it.call } ?: throw Exception("This should never happen")
+                val caller = game.players.maxByOrNull { it.call } ?: throw Exception("This should never happen")
                 if (caller.id != me.id) throw InvalidOperationException("Invalid call")
                 logger.info("${me.id} has raised the call")
                 currentHand.currentPlayerId = currentRound.dealerId
@@ -299,6 +310,7 @@ class GameService(
         publishGame(game = game, type = type)
     }
 
+    @Transactional
     fun chooseFromDummy(gameId: String, playerId: String, selectedCards: List<Card>, suit: Suit) {
         // 1. Get Game
         val game = get(gameId)
@@ -344,6 +356,7 @@ class GameService(
         publishGame(game = game, type = EventType.CHOOSE_FROM_DUMMY)
     }
 
+    @Transactional
     fun buyCards(gameId: String, playerId: String, selectedCards: List<Card>) {
         // 1. Get Game
         val game = get(gameId)
@@ -388,13 +401,17 @@ class GameService(
         }
         else nextPlayer(game.players, me.id).id
 
-        // 9. Save game
+        // 10. Save game
         save(game)
 
-        // 10. Publish updated game
+        // 11. Publish updated game
         publishGame(game = game, type = EventType.BUY_CARDS)
+
+        // 12. Publish buy cards event
+        publishBuyCardsEvent(game, BuyCardsEvent(playerId, 5 - selectedCards.size))
     }
 
+    @Transactional
     fun playCard(gameId: String, playerId: String, myCard: Card) {
         // 1. Get Game
         val game = get(gameId)
@@ -452,13 +469,9 @@ class GameService(
                 calculateScores(game)
 
                 // Check if game is over
-                game.players.forEach {
-                    if (it.score >= 110) {
-                        game.status = GameStatus.FINISHED
-                    }
-                }
-                type = if (game.status == GameStatus.FINISHED) {
+                type = if (isGameOver(game.players)) {
                     logger.info("Game is over.")
+                    game.status = GameStatus.FINISHED
                     EventType.GAME_OVER
                 } else {
                     logger.info("Game isn't over yet. Starting a new round")
@@ -481,6 +494,10 @@ class GameService(
         publishGame(game = game, type = type)
     }
 
+    fun isGameOver(players: List<Player>): Boolean {
+        return players.maxOf { player -> player.score } >= 110
+    }
+
     fun parsePlayerGameState(game: Game, playerId: String): PlayerGameState {
 
         // 1. Find player
@@ -492,7 +509,7 @@ class GameService(
         }
 
         // 3. Get max call
-        val highestCaller = game.players.maxBy { player -> player.call }
+        val highestCaller = game.players.maxByOrNull { player -> player.call }
 
         // 5. Return player's game state
         return PlayerGameState(
@@ -562,6 +579,18 @@ class GameService(
         }
     }
 
+    private fun publishBuyCardsEvent(game: Game, buyCardsEvent: BuyCardsEvent) {
+
+        game.players.forEach { player ->
+            if (player.id != "dummy" && player.id != buyCardsEvent.playerId) {
+                publishService.publishContent(recipient = "${player.id}${game.id!!}",
+                        topic = "/game",
+                        content = buyCardsEvent,
+                        contentType = EventType.BUY_CARDS_NOTIFICATION)
+            }
+        }
+    }
+
     private fun calculateScores(game: Game): List<Player> {
         // 1. Calculate the scores for the round
         val scores = calculateScoresForRound(game.currentRound, game.players)
@@ -572,7 +601,7 @@ class GameService(
         return game.players
     }
 
-    private fun calculateScoresForRound(round: Round, players: List<Player>): MutableMap<String, Int> {
+    fun calculateScoresForRound(round: Round, players: List<Player>): MutableMap<String, Int> {
 
         var bestCard: Pair<Player, Card>? = null
         val scores: MutableMap<String, Int> = mutableMapOf()
@@ -634,7 +663,7 @@ class GameService(
         return game
     }
 
-    fun findPlayer(players: List<Player>, playerId: String): Player {
+    private fun findPlayer(players: List<Player>, playerId: String): Player {
         return players.find { it.id == playerId } ?: throw NotFoundException("Can't find the player")
     }
 
@@ -648,8 +677,14 @@ class GameService(
 
 
     private fun updatePlayersScore(players: List<Player>, teamId: String, points: Int) {
-        players.forEach {
-            if(it.teamId == teamId) it.score = it.score + points
+
+        players.forEach { player ->
+            if(player.teamId == teamId) {
+                // Update Score
+                player.score = player.score + points
+                // Update Rings
+                if (points < 0) player.rings = player.rings + 1
+            }
         }
     }
 
@@ -657,14 +692,14 @@ class GameService(
 
         // 1. Was a suit or wild card played? If not set the lead out card as the suit
         val activeSuit  = if (currentHand.playedCards.filter { it.value.suit == suit || it.value.suit == Suit.WILD }.isEmpty())
-            currentHand.playedCards[players[0].id]?.suit
+            currentHand.leadOut!!.suit
         else suit
 
         logger.info("Active suit is: $activeSuit")
 
         // 2. Find winning card
-        val winningCard = if (activeSuit == suit) currentHand.playedCards.filter { it.value.suit == activeSuit || it.value.suit == Suit.WILD }.maxBy { it.value.value }
-        else currentHand.playedCards.filter { it.value.suit == activeSuit }.maxBy { it.value.coldValue }
+        val winningCard = if (activeSuit == suit) currentHand.playedCards.filter { it.value.suit == activeSuit || it.value.suit == Suit.WILD }.maxByOrNull { it.value.value }
+        else currentHand.playedCards.filter { it.value.suit == activeSuit }.maxByOrNull { it.value.coldValue }
         winningCard?: throw InvalidOperationException("Can't find the winning card")
 
         logger.info("Winning card is: $winningCard")
@@ -706,12 +741,6 @@ class GameService(
             return players[currentIndex + 1]
         }
         return players[0]
-    }
-
-    private fun previousPlayer(players: List<Player>, currentPlayerId: String): Player {
-        val currentIndex = players.indexOfFirst { it.id == currentPlayerId }
-        if (currentIndex == 0) return players.last()
-        return players[currentIndex + 1]
     }
 
     private fun orderPlayersAtStartOfGame(dealerId: String, players: List<Player>): List<Player> {
@@ -767,8 +796,7 @@ class GameService(
     }
 
     companion object {
-        private val logger = LogManager.getLogger(this::class.java)
-        private val secureRandom = SecureRandom()
+        private val logger = LogManager.getLogger(GameService::class.java)
         private val VALID_CALL = listOf(0, 10, 15, 20, 25, 30)
     }
 

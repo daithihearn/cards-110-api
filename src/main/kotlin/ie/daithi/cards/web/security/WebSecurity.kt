@@ -1,6 +1,5 @@
 package ie.daithi.cards.web.security
 
-import com.google.common.collect.ImmutableList
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpMethod
@@ -26,7 +25,7 @@ class WebSecurity(
 
     override fun configure(http: HttpSecurity) {
         http.cors().and().authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/swagger-ui.html**").permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/webjars/springfox-swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/websocket/**").permitAll()
@@ -56,15 +55,15 @@ class WebSecurity(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = allowedOrigins
-        configuration.allowedMethods = ImmutableList.of("HEAD",
+        configuration.allowedMethods = listOf("HEAD",
                 "GET", "POST", "PUT", "DELETE", "PATCH")
         // setAllowCredentials(true) is important, otherwise:
         // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
         configuration.allowCredentials = true
         // setAllowedHeaders is important! Without it, OPTIONS preflight request
         // will fail with 403 Invalid CORS request
-        configuration.allowedHeaders = ImmutableList.of("Authorization", "Cache-Control", "Content-Type")
-        configuration.exposedHeaders = ImmutableList.of("Authorization", "Cache-Control", "Content-Type")
+        configuration.allowedHeaders = listOf("Authorization", "Cache-Control", "Content-Type")
+        configuration.exposedHeaders = listOf("Authorization", "Cache-Control", "Content-Type")
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/api/v1/**", configuration)
         return source
