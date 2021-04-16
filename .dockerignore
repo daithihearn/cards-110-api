@@ -29,4 +29,8 @@ nbdist/
 mvnw
 mvnw.cmd
 .DS_Store
+
+### Build stuff
 build/
+build.sh
+build.bat
