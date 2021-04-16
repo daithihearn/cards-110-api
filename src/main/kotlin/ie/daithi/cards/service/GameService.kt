@@ -233,7 +233,10 @@ class GameService(
         // 6. Check they are the next player
         if (currentHand.currentPlayerId != playerId) throw InvalidOperationException("It's not your go!")
 
-        // 7. Check if call value is valid i.e. > all other calls
+        // 7. Are they in the bunker? If they are on -30 or less then they can only call 0
+        if (me.score <= BUNKER_SCORE && call != 0 ) throw InvalidOperationException("You are in the bunker!")
+
+        // 8. Check if call value is valid i.e. > all other calls
         if  (currentRound.dealerSeeingCall) {
             me.call = call
         } else if (call != 0) {
@@ -243,10 +246,10 @@ class GameService(
             else throw InvalidOperationException("Call must be higher than ${currentCaller.call}")
         }
 
-        // 8. Update my call
+        // 9. Update my call
         game.players.forEach { if (it.id == me.id) it.call = me.call }
 
-        // 9. Set next player/round status
+        // 10. Set next player/round status
         var type = EventType.CALL
         if (call == 30) {
             logger.info("Jink called by $me")
@@ -303,10 +306,10 @@ class GameService(
             currentHand.currentPlayerId = nextPlayer(game.players, me.id).id
         }
 
-        // 10. Save game
+        // 11. Save game
         save(game)
 
-        // 11. Publish updated game
+        // 12. Publish updated game
         publishGame(game = game, type = type)
     }
 
@@ -798,6 +801,7 @@ class GameService(
     companion object {
         private val logger = LogManager.getLogger(GameService::class.java)
         private val VALID_CALL = listOf(0, 10, 15, 20, 25, 30)
+        private val BUNKER_SCORE = -30
     }
 
 }
