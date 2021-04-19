@@ -91,7 +91,7 @@ class AppConfig(
         config.password = RedisPassword.of(redisUri.password)
 
         val clientConfig = if (redisUri.isSsl)
-            LettuceClientConfiguration.builder().useSsl().build()
+            LettuceClientConfiguration.builder().useSsl().disablePeerVerification().build()
         else
             LettuceClientConfiguration.builder().build()
 
