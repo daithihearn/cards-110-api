@@ -9,8 +9,6 @@ data class AppUser (
     @Id
     var id: String? = null,
     @Indexed(unique = true)
-    val subject: String,
-    @Indexed(unique = true)
     val email: String,
     val name: String,
     val picture: String? = null

@@ -6,7 +6,5 @@ import java.util.*
 
 interface AppUserRepo: MongoRepository<AppUser, String> {
     fun findByIdIn(userIds: List<String>): List<AppUser>
-    fun existsBySubject(subject: String): Boolean
-    fun findOneBySubject(subject: String): AppUser
     fun findOneByEmail(email: String): Optional<AppUser>
 }

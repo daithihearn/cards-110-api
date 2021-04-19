@@ -28,7 +28,6 @@ class WebSecurity(
                 .antMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/webjars/springfox-swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/websocket/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/v2/api-docs").permitAll()
                 .antMatchers(HttpMethod.GET, "/static/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/assets/**").permitAll()

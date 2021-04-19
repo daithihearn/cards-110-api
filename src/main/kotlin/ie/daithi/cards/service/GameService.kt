@@ -575,7 +575,6 @@ class GameService(
         game.players.forEach { player ->
             if (player.id != "dummy") {
                 publishService.publishContent(recipient = "${player.id}${game.id!!}",
-                        topic = "/game",
                         content = parsePlayerGameState(game = game, playerId = player.id),
                         contentType = type)
             }
@@ -587,7 +586,6 @@ class GameService(
         game.players.forEach { player ->
             if (player.id != "dummy" && player.id != buyCardsEvent.playerId) {
                 publishService.publishContent(recipient = "${player.id}${game.id!!}",
-                        topic = "/game",
                         content = buyCardsEvent,
                         contentType = EventType.BUY_CARDS_NOTIFICATION)
             }

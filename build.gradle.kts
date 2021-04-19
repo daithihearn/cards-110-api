@@ -67,6 +67,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
 	implementation("org.springframework.security:spring-security-oauth2-resource-server:5.3.3.RELEASE")
