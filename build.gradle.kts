@@ -38,11 +38,15 @@ repositories {
 	}
 }
 
-val versionFile = Properties()
-versionFile.load(FileInputStream(".env"))
+base {
+	archivesBaseName = "cards-110-api"
+}
+
+//val versionFile = Properties()
+//versionFile.load(FileInputStream(".env"))
 
 group = "ie.daithi.cards"
-version = "${versionFile.getProperty("CARDS_API_VERSION")}"
+//version = "${versionFile.getProperty("CARDS_API_VERSION")}"
 java.sourceCompatibility = JavaVersion.VERSION_14
 
 description = "api"
