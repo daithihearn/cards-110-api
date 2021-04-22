@@ -234,7 +234,7 @@ class GameService(
         if (currentHand.currentPlayerId != playerId) throw InvalidOperationException("It's not your go!")
 
         // 7. Are they in the bunker? If they are on -30 or less then they can only call 0
-        if (me.score <= BUNKER_SCORE && call != 0 ) throw InvalidOperationException("You are in the bunker!")
+        if (me.score < BUNKER_SCORE && call != 0 ) throw InvalidOperationException("You are in the bunker!")
 
         // 8. Check if call value is valid i.e. > all other calls
         if  (currentRound.dealerSeeingCall) {
