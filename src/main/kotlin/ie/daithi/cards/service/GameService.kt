@@ -91,20 +91,12 @@ class GameService(
         return gameRepo.findAll()
     }
 
-    fun getActiveForPlayer(playerId: String): List<Game> {
-        return gameRepo.findByPlayersIdAndStatusOrStatus(playerId, GameStatus.ACTIVE, GameStatus.FINISHED)
+    fun getMyActive(userId: String): List<Game> {
+        return gameRepo.getMyActive(userId)
     }
 
     fun getActiveForAdmin(adminId: String): List<Game> {
         return gameRepo.findByAdminIdAndStatusOrStatus(adminId, GameStatus.ACTIVE, GameStatus.FINISHED)
-    }
-
-    @Transactional
-    fun finish(id: String) {
-        val game = get(id)
-        if( game.status == GameStatus.ACTIVE) throw InvalidStatusException("Can only finish a game that is in STARTED state not ${game.status}")
-        game.status = GameStatus.COMPLETED
-        save(game)
     }
 
     @Transactional
@@ -460,10 +452,8 @@ class GameService(
         } else {
             logger.info("All players have played a card")
 
-            // Publish the game and wait 4 seconds. This is to allow time to see the card
-            // TODO Use a computable future or something rather than stopping the thread
+            // Publish the game. The frontend will need to wait a while to allow the users to view the cards
             publishGame(game = game, type = EventType.LAST_CARD_PLAYED)
-            Thread.sleep(4000)
 
             if (currentRound.completedHands.size >= 4) {
                 logger.info("All hands have been played in this round")
@@ -514,12 +504,20 @@ class GameService(
         // 3. Get max call
         val highestCaller = game.players.maxByOrNull { player -> player.call }
 
+        // 4. Add dummy if applicable
+        val iamGoer = game.currentRound.goerId == me.id
+        if (iamGoer && RoundStatus.CALLED == game.currentRound.status && dummy != null)
+            me.cards = me.cards.plus(dummy.cards)
+
         // 5. Return player's game state
         return PlayerGameState(
+                id = game.id!!,
                 me = me,
+                isMyGo = game.currentRound.currentHand.currentPlayerId == me.id,
+                iamGoer = iamGoer,
+                iamDealer = game.currentRound.dealerId == me.id,
                 cards = me.cards,
                 status = game.status,
-                dummy = dummy?.cards,
                 round = game.currentRound,
                 maxCall = highestCaller?.call ?: 0,
                 playerProfiles = game.players.filter { p -> p.id != "dummy" }
