@@ -242,7 +242,9 @@ class GameService(
         game.players.forEach { if (it.id == me.id) it.call = me.call }
 
         // 10. Set next player/round status
-        var type = EventType.CALL
+        var type = if (call > 0) EventType.CALL
+        else EventType.PASS
+
         if (call == 30) {
             logger.info("Jink called by $me")
             if (currentHand.currentPlayerId == currentRound.dealerId) {
