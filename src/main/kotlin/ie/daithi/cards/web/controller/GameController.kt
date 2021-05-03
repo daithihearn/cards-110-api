@@ -7,7 +7,8 @@ import ie.daithi.cards.service.AppUserService
 import ie.daithi.cards.service.GameService
 import ie.daithi.cards.web.model.CreateGame
 import ie.daithi.cards.model.AppUser
-import ie.daithi.cards.model.PlayerGameState
+import ie.daithi.cards.model.GameState
+import ie.daithi.cards.service.SpectatorService
 import ie.daithi.cards.web.exceptions.ForbiddenException
 import io.swagger.annotations.*
 import org.apache.logging.log4j.LogManager
@@ -20,11 +21,12 @@ import org.springframework.web.bind.annotation.*
 @Api(tags = ["Game"], description = "Endpoints that relate to CRUD operations on Games")
 class GameController (
         private val gameService: GameService,
-        private val appUserService: AppUserService
+        private val appUserService: AppUserService,
+        private val spectatorService: SpectatorService
 ){
 
 
-    @GetMapping("/admin/game")
+    @GetMapping("/game")
     @ResponseStatus(value = HttpStatus.OK)
     @ApiOperation(value = "Get Game", notes = "Get the game")
     @ApiResponses(
@@ -69,14 +71,14 @@ class GameController (
     @ResponseBody
     fun getPlayersForGame(@RequestParam gameId: String): List<AppUser> {
         // 1. Get current user ID
-        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
-        val user = appUserService.getUserBySubject(subject)
+//        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
+//        val user = appUserService.getUserBySubject(subject)
 
         // 2. Get Game
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(user.id!!) && game.adminId != user.id!!) throw ForbiddenException("Can only get players if you are part of the game or are the admin.")
+//        if (!game.players.map {player -> player.id }.contains(user.id!!) && game.adminId != user.id!!) throw ForbiddenException("Can only get players if you are part of the game or are the admin.")
 
         // 4. Get players
         return appUserService.getUsers(game.players.map { player -> player.id})
@@ -280,14 +282,14 @@ class GameController (
         gameService.replay(currentGame = game, playerId = user.id!!)
     }
 
-    @GetMapping("/game")
+    @GetMapping("/gameState")
     @ResponseStatus(value = HttpStatus.OK)
     @ApiOperation(value = "Get game", notes = "Get the game")
     @ApiResponses(
             ApiResponse(code = 200, message = "Request successful")
     )
     @ResponseBody
-    fun getPlayerGameState(@RequestParam gameId: String): PlayerGameState {
+    fun getGameState(@RequestParam gameId: String): GameState {
         // 1. Get current user ID
         val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
         val user = appUserService.getUserBySubject(subject)
@@ -296,10 +298,16 @@ class GameController (
         val game = gameService.get(gameId)
 
         // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only replay game if you are part of the game.")
+        val me = game.players.find {player -> player.id == user.id!! }
+
+        // 4. If not a player make a spectator
+        if (me == null) {
+            spectatorService.register(user.id!!, gameId)
+            return gameService.parseSpectatorGameState(game = game)
+        }
 	
-	    // 4. Get game for player
-        return gameService.parsePlayerGameState(game = game, playerId = user.id!!)
+	    // 5. Get game for player
+        return gameService.parsePlayerGameState(player = me, game = game)
     }
 
     companion object {

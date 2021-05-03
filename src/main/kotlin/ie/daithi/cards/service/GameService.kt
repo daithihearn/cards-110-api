@@ -20,7 +20,8 @@ import java.util.*
 class GameService(
         private val gameRepo: GameRepo,
         private val deckService: DeckService,
-        private val publishService: PublishService
+        private val publishService: PublishService,
+        private val spectatorService: SpectatorService
 ) {
     @Transactional
     fun create(adminId: String, name: String, playerIds: List<String>): Game {
@@ -493,36 +494,48 @@ class GameService(
         return players.maxOf { player -> player.score } >= 110
     }
 
-    fun parsePlayerGameState(game: Game, playerId: String): PlayerGameState {
+    fun parsePlayerGameState(player: Player, game: Game): GameState {
 
-        // 1. Find player
-        val me = game.players.find { player -> player.id == playerId } ?: throw NotFoundException("Can't find player")
-
-        // 2. Find dummy
-        val dummy = (game.currentRound.goerId == playerId).let {
+        // 1. Find dummy
+        val dummy = (game.currentRound.goerId == player.id).let {
             game.players.find { player -> player.id == "dummy" }
         }
 
-        // 3. Get max call
-        val highestCaller = game.players.maxByOrNull { player -> player.call }
+        // 2. Get max call
+        val highestCaller = game.players.maxByOrNull { p -> p.call }
 
-        // 4. Add dummy if applicable
-        val iamGoer = game.currentRound.goerId == me.id
+        // 3. Add dummy if applicable
+        val iamGoer = game.currentRound.goerId == player.id
         if (iamGoer && RoundStatus.CALLED == game.currentRound.status && dummy != null)
-            me.cards = me.cards.plus(dummy.cards)
+            player.cards = player.cards.plus(dummy.cards)
 
-        // 5. Return player's game state
-        return PlayerGameState(
+        // 4. Return player's game state
+        return GameState(
                 id = game.id!!,
-                me = me,
-                isMyGo = game.currentRound.currentHand.currentPlayerId == me.id,
+                me = player,
+                iamSpectator = false,
+                isMyGo = game.currentRound.currentHand.currentPlayerId == player.id,
                 iamGoer = iamGoer,
-                iamDealer = game.currentRound.dealerId == me.id,
-                cards = me.cards,
+                iamDealer = game.currentRound.dealerId == player.id,
+                cards = player.cards,
                 status = game.status,
                 round = game.currentRound,
                 maxCall = highestCaller?.call ?: 0,
                 playerProfiles = game.players.filter { p -> p.id != "dummy" }
+        )
+    }
+
+    fun parseSpectatorGameState(game: Game): GameState {
+        // 1. Return spectators's game state
+        return GameState(
+            id = game.id!!,
+            iamSpectator = true,
+            isMyGo = false,
+            iamGoer = false,
+            iamDealer = false,
+            status = game.status,
+            round = game.currentRound,
+            playerProfiles = game.players.filter { p -> p.id != "dummy" }
         )
     }
 
@@ -572,23 +585,39 @@ class GameService(
 
     private fun publishGame(game: Game, type: EventType) {
 
+        // Publish for players
         game.players.forEach { player ->
             if (player.id != "dummy") {
                 publishService.publishContent(recipient = "${player.id}${game.id!!}",
-                        content = parsePlayerGameState(game = game, playerId = player.id),
+                        content = parsePlayerGameState(player = player, game = game),
                         contentType = type)
             }
+        }
+
+        // Publish for spectators
+        spectatorService.getSpectators(game.id!!).forEach { spectator ->
+            publishService.publishContent(recipient = "${spectator.id}${game.id}",
+                content = parseSpectatorGameState(game = game),
+                contentType = type)
         }
     }
 
     private fun publishBuyCardsEvent(game: Game, buyCardsEvent: BuyCardsEvent) {
 
+        // Publish for players
         game.players.forEach { player ->
             if (player.id != "dummy" && player.id != buyCardsEvent.playerId) {
                 publishService.publishContent(recipient = "${player.id}${game.id!!}",
                         content = buyCardsEvent,
                         contentType = EventType.BUY_CARDS_NOTIFICATION)
             }
+        }
+
+        // Publish for spectators
+        spectatorService.getSpectators(game.id!!).forEach { spectator ->
+            publishService.publishContent(recipient = "${spectator.id}${game.id}",
+                content = buyCardsEvent,
+                contentType = EventType.BUY_CARDS_NOTIFICATION)
         }
     }
 
@@ -787,7 +816,7 @@ class GameService(
 
     private fun validateNumberOfCardsSelectedWhenBuying(cardsSelected: Int, numPlayers: Int) {
         val numberHaveToKeep = when (numPlayers) {
-            in 2..4  -> 0
+            in 2..4 -> 0
             5 -> 1
             else -> 2
         }

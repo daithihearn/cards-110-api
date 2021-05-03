@@ -32,6 +32,8 @@ class WebSecurity(
                 .antMatchers(HttpMethod.GET, "/static/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/assets/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/manifest.json").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/**").hasAuthority("SCOPE_read:game")
+                .antMatchers(HttpMethod.PUT, "/api/v1/**").hasAuthority("SCOPE_write:game")
                 .antMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority("SCOPE_read:admin")
                 .antMatchers(HttpMethod.PUT, "/api/v1/admin/**").hasAuthority("SCOPE_write:admin")
                 .antMatchers(HttpMethod.DELETE, "/api/v1/admin/**").hasAuthority("SCOPE_delete:admin")
