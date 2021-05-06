@@ -18,7 +18,7 @@ class DeckService(
 
         val deckList = Card.values().toList().shuffled(SecureRandom())
         val deck = Stack<Card>()
-        deck.addAll(deckList)
+        deck.addAll(deckList.filter { card -> card != Card.EMPTY })
         deckRepo.save(
                 Deck(id = gameId,
                 cards = deck)

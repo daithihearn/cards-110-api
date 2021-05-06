@@ -12,5 +12,6 @@ data class Player(
         var cardsBought: Int? = null,
         var score: Int = 0,
         var rings: Int = 0,
-        val teamId: String
+        val teamId: String,
+        var winner: Boolean = false
 )

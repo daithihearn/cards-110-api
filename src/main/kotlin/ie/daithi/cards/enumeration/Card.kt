@@ -1,6 +1,7 @@
 package ie.daithi.cards.enumeration
 
 enum class Card(val value: Int, val coldValue: Int, val suit: Suit, val renegable: Boolean) {
+    EMPTY(0, 0, Suit.EMPTY, false),
     TWO_HEARTS(101, 2, Suit.HEARTS, false),
     THREE_HEARTS(102,3, Suit.HEARTS, false),
     FOUR_HEARTS(103, 4, Suit.HEARTS, false),

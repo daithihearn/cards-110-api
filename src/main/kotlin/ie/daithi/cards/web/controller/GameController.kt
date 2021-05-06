@@ -8,6 +8,7 @@ import ie.daithi.cards.service.GameService
 import ie.daithi.cards.web.model.CreateGame
 import ie.daithi.cards.model.AppUser
 import ie.daithi.cards.model.GameState
+import ie.daithi.cards.service.GameUtils
 import ie.daithi.cards.service.SpectatorService
 import ie.daithi.cards.web.exceptions.ForbiddenException
 import io.swagger.annotations.*
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*
 @Api(tags = ["Game"], description = "Endpoints that relate to CRUD operations on Games")
 class GameController (
         private val gameService: GameService,
+        private val gameUtils: GameUtils,
         private val appUserService: AppUserService,
         private val spectatorService: SpectatorService
 ){
@@ -303,11 +305,11 @@ class GameController (
         // 4. If not a player make a spectator
         if (me == null) {
             spectatorService.register(user.id!!, gameId)
-            return gameService.parseSpectatorGameState(game = game)
+            return gameUtils.parseSpectatorGameState(game = game)
         }
 	
 	    // 5. Get game for player
-        return gameService.parsePlayerGameState(player = me, game = game)
+        return gameUtils.parsePlayerGameState(player = me, game = game)
     }
 
     companion object {
