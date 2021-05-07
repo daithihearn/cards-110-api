@@ -2,7 +2,16 @@ FROM openjdk:14-alpine AS builder
 
 WORKDIR /opt/app
 
-COPY ./ ./
+COPY ./gradle ./gradle
+COPY ./gradlew ./
+COPY ./build.gradle.kts ./
+COPY ./settings.gradle ./
+COPY ./.env ./
+COPY ./system.properties ./
+
+RUN ./gradlew clean build || return 0
+
+COPY ./src ./src
 
 RUN ./gradlew build install
 
