@@ -19,6 +19,7 @@ class StatsService(
         val match2 = Aggregation.match(Criteria.where("players._id").`is`(playerId))
         val project = Aggregation.project()
             .and("\$id").`as`("gameId")
+            .and("\$timestamp").`as`("timestamp")
             .and("\$players.winner").`as`("winner")
             .and("\$players.score").`as`("score")
             .and("\$players.rings").`as`("rings")
