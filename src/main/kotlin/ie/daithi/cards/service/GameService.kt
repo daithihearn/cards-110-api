@@ -91,8 +91,8 @@ class GameService(
         return gameRepo.findAll()
     }
 
-    fun getMyActive(userId: String): List<Game> {
-        return gameRepo.getMyActive(userId)
+    fun getMyGames(userId: String): List<Game> {
+        return gameRepo.getMyGames(userId)
     }
 
     fun getActiveForAdmin(adminId: String): List<Game> {
