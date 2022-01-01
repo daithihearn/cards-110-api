@@ -64,7 +64,7 @@ class ProfileController(
         // 2. Check if a record exists
         return appUserService.updateUser(subject = subject,
                 name = updateProfile.name,
-                email = updateProfile.email.trim().toLowerCase(),
+                email = updateProfile.email.trim().lowercase(),
                 picture = updateProfile.picture)
     }
 }
