@@ -13,7 +13,7 @@ RUN ./gradlew clean build || return 0
 
 COPY ./src ./src
 
-RUN ./gradlew build install
+RUN ./gradlew build publishToMavenLocal
 
 FROM openjdk:14-alpine
 

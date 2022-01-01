@@ -4,7 +4,7 @@ import java.util.*
 
 buildscript {
 	val kotlinVersion = "1.4.10"
-	val springBootVersion = "2.3.5.RELEASE"
+	val springBootVersion = "2.6.2"
 	repositories {
 		mavenLocal()
 		mavenCentral()
@@ -16,13 +16,13 @@ buildscript {
 }
 
 plugins {
-    id("org.springframework.boot") version "2.3.5.RELEASE"
+    id("org.springframework.boot") version "2.6.2"
     id("maven-publish")
     id("org.jetbrains.kotlin.jvm") version "1.4.10"
 	kotlin("plugin.spring") version "1.4.10"
 }
 
-apply(plugin = "maven")
+apply(plugin = "maven-publish")
 apply(plugin = "io.spring.dependency-management")
 
 tasks.withType<JavaCompile> {
@@ -32,7 +32,6 @@ tasks.withType<JavaCompile> {
 repositories {
 	mavenLocal()
 	mavenCentral()
-	maven(url = "https://jitpack.io")
 	flatDir {
 		dirs("libs")
 	}
@@ -51,7 +50,7 @@ java.sourceCompatibility = JavaVersion.VERSION_14
 
 description = "api"
 
-val springBootVersion: String = "2.3.5.RELEASE"
+val springBootVersion: String = "2.6.2"
 val swaggerVersion: String = "3.0.0"
 
 dependencies {
