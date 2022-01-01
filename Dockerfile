@@ -1,4 +1,4 @@
-FROM openjdk:14-alpine AS builder
+FROM openjdk:17-alpine AS builder
 
 WORKDIR /opt/app
 
@@ -15,7 +15,7 @@ COPY ./src ./src
 
 RUN ./gradlew build publishToMavenLocal
 
-FROM openjdk:14-alpine
+FROM openjdk:17-alpine
 
 WORKDIR /opt/app
 
