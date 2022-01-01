@@ -3,7 +3,7 @@ import java.io.FileInputStream
 import java.util.*
 
 buildscript {
-	val kotlinVersion = "1.4.10"
+	val kotlinVersion = "1.6.10"
 	val springBootVersion = "2.6.2"
 	repositories {
 		mavenLocal()
@@ -18,8 +18,8 @@ buildscript {
 plugins {
     id("org.springframework.boot") version "2.6.2"
     id("maven-publish")
-    id("org.jetbrains.kotlin.jvm") version "1.4.10"
-	kotlin("plugin.spring") version "1.4.10"
+    id("org.jetbrains.kotlin.jvm") version "1.6.10"
+	kotlin("plugin.spring") version "1.6.10"
 }
 
 apply(plugin = "maven-publish")
@@ -63,8 +63,8 @@ dependencies {
 	implementation("com.heroku.sdk:env-keystore:1.1.6")
 
 	// Kotlin dependencies
-	implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
 
 	// Spring dependencies
 	implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
