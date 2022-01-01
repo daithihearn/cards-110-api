@@ -46,7 +46,7 @@ base {
 
 group = "ie.daithi.cards"
 //version = "${versionFile.getProperty("CARDS_API_VERSION")}"
-java.sourceCompatibility = JavaVersion.VERSION_14
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 description = "api"
 
@@ -103,6 +103,6 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "14"
+		jvmTarget = "17"
 	}
 }
