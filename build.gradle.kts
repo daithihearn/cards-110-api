@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.FileInputStream
-import java.util.*
 
 buildscript {
 	val kotlinVersion = "1.6.10"
@@ -37,15 +35,7 @@ repositories {
 	}
 }
 
-base {
-	archivesBaseName = "cards-110-api"
-}
-
-//val versionFile = Properties()
-//versionFile.load(FileInputStream(".env"))
-
 group = "ie.daithi.cards"
-//version = "${versionFile.getProperty("CARDS_API_VERSION")}"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 description = "api"
@@ -59,7 +49,7 @@ dependencies {
 
 	// External Dependencies
 
-	implementation("org.bouncycastle:bcprov-jdk15on:1.65")
+	implementation("org.bouncycastle:bcprov-jdk15on:1.69")
 	implementation("com.heroku.sdk:env-keystore:1.1.6")
 
 	// Kotlin dependencies
@@ -73,22 +63,22 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
-	implementation("org.springframework.security:spring-security-oauth2-resource-server:5.3.3.RELEASE")
-	implementation("org.springframework.security:spring-security-oauth2-jose:5.3.3.RELEASE")
+	implementation("org.springframework.security:spring-security-oauth2-resource-server:5.5.1")
+	implementation("org.springframework.security:spring-security-oauth2-jose:5.5.1")
 
 	// Springfox
 	implementation("io.springfox:springfox-swagger2:$swaggerVersion")
 	implementation("io.springfox:springfox-swagger-ui:$swaggerVersion")
 
 	// Other
-	implementation("com.sendgrid:sendgrid-java:4.4.7")
-	implementation("com.auth0:java-jwt:3.10.2")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+")
-	implementation("org.apache.commons:commons-text:1.8")
+	implementation("com.sendgrid:sendgrid-java:4.8.1")
+	implementation("com.auth0:java-jwt:3.18.2")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+	implementation("org.apache.commons:commons-text:1.9")
 
 	//Test
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
-	testImplementation("io.mockk:mockk:1.10.2")
+	testImplementation("io.mockk:mockk:1.12.1")
 
 
 }
