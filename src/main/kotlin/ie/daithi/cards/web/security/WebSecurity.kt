@@ -25,7 +25,7 @@ class WebSecurity(
 
     override fun configure(http: HttpSecurity) {
         http.cors().and().authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-ui.html**").permitAll()
                 .antMatchers(HttpMethod.GET, "/webjars/springfox-swagger-ui/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/v2/api-docs").permitAll()
