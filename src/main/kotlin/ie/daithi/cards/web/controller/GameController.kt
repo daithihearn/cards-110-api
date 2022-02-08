@@ -40,7 +40,7 @@ class GameController (
         return gameService.get(gameId)
     }
 
-    @GetMapping("/admin/game/all")
+    @GetMapping("/game/all")
     @ResponseStatus(value = HttpStatus.OK)
     @ApiOperation(value = "Get all games", notes = "Get all games")
     @ApiResponses(
@@ -85,38 +85,6 @@ class GameController (
         // 4. Get players
         return appUserService.getUsers(game.players.map { player -> player.id})
     }
-
-    @GetMapping("/game/all")
-    @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Get all my games. This can be either a game I created or a game that I am playing in.", notes = "Get all my active games")
-    @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
-    )
-    @ResponseBody
-    fun getMyGames(): List<Game> {
-        // 1. Get current user ID
-        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
-        val user = appUserService.getUserBySubject(subject)
-
-        // 2. Get active games for player
-        return gameService.getMyGames(user.id!!)
-    }
-
-//    @GetMapping("/admin/game/active")
-//    @ResponseStatus(value = HttpStatus.OK)
-//    @ApiOperation(value = "Get all active games", notes = "Get all active games")
-//    @ApiResponses(
-//            ApiResponse(code = 200, message = "Request successful")
-//    )
-//    @ResponseBody
-//    fun getActiveGamesForAdmin(): List<Game> {
-//        // 1. Get current user ID
-//        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
-//        val user = appUserService.getUserBySubject(subject)
-//
-//        // 2. Get active games for admin
-//        return gameService.getActiveForAdmin(user.id!!)
-//    }
 
     @PutMapping("/admin/game")
     @ResponseStatus(value = HttpStatus.OK)
