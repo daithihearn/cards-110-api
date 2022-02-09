@@ -13,7 +13,7 @@ class AppUserService (
 
     fun getUser(userId: String): AppUser {
         val appUser = appUserRepo.findById(userId)
-        if (appUser.isEmpty) throw NotFoundException("AppUser($userId) not found")
+        if (!appUser.isPresent) throw NotFoundException("AppUser($userId) not found")
         return appUser.get()
     }
 
@@ -30,7 +30,11 @@ class AppUserService (
     }
 
     fun updateUser(subject: String, name: String, email: String, picture: String?) {
-        appUserRepo.save(AppUser(id = subject, name = name, email = email, picture = picture))
+        val existingUser = appUserRepo.findById(subject)
+        val updatedPicture = if (existingUser.isPresent && existingUser.get().pictureLocked)
+            existingUser.get().picture
+        else picture
+        appUserRepo.save(AppUser(id = subject, name = name, email = email, picture = updatedPicture ))
     }
 
     fun existsBySubject(subject: String): Boolean {
