@@ -57,7 +57,8 @@ class ProfileController(
     @ApiResponses(
             ApiResponse(code = 200, message = "Request successful")
     )
-    fun updateProfile(@RequestBody updateProfile: UpdateProfile) {
+    @ResponseBody
+    fun updateProfile(@RequestBody updateProfile: UpdateProfile): AppUser {
         // 1. Get current user ID
         val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
 
