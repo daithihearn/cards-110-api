@@ -11,6 +11,6 @@ data class AppUser (
     @Indexed(unique = true)
     val email: String,
     val name: String,
-    val picture: String? = null,
+    var picture: String? = null,
     val pictureLocked: Boolean = false
 )

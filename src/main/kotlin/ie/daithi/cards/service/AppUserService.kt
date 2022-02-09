@@ -31,10 +31,14 @@ class AppUserService (
 
     fun updateUser(subject: String, name: String, email: String, picture: String?) {
         val existingUser = appUserRepo.findById(subject)
-        val updatedPicture = if (existingUser.isPresent && existingUser.get().pictureLocked)
-            existingUser.get().picture
-        else picture
-        appUserRepo.save(AppUser(id = subject, name = name, email = email, picture = updatedPicture ))
+
+        if (existingUser.isPresent) {
+            val newUser = existingUser.get()
+            if (!existingUser.get().pictureLocked) newUser.picture = picture
+
+            appUserRepo.save(newUser)
+        } else
+            appUserRepo.save(AppUser(id = subject, name = name, email = email, picture = picture ))
     }
 
     fun existsBySubject(subject: String): Boolean {
