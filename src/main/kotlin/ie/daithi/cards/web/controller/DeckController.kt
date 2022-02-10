@@ -32,7 +32,7 @@ class DeckController(
     @ApiOperation(value = "Create Game", notes = "Shuffles the deck")
     @ApiResponses(
             ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 502, message = "An error occurred when attempting to send email")
+            ApiResponse(code = 502, message = "An error occurred when attempting to shuffle deck")
     )
     fun shuffle(@RequestParam deckId: String) {
         deckService.shuffle(deckId)

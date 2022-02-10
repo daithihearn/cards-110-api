@@ -32,7 +32,7 @@ class GameService(
         // 2. Shuffle players
         val playerIdsShuffled = playerIds.shuffled()
 
-        // 4. Create Players and Issue emails
+        // 4. Create Players
         val players = arrayListOf<Player>()
         // If we have six players we will assume this is a team game
         if (playerIdsShuffled.size == 6) {
@@ -133,7 +133,7 @@ class GameService(
 
         } else {
             oldPlayers.forEachIndexed { index, player ->
-                // For an individual game set the team ID == email
+                // For an individual game set the team ID == player ID
                 players.add(Player(id = player.id, seatNumber = index + 1, teamId = player.id))
             }
         }
@@ -152,8 +152,7 @@ class GameService(
                 status = GameStatus.ACTIVE,
                 adminId = currentGame.adminId,
                 players = players,
-                currentRound = round,
-                emailMessage = currentGame.emailMessage)
+                currentRound = round)
 
         // 6. Save the game
         game = save(game)

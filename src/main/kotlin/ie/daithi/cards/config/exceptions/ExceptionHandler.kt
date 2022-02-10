@@ -5,7 +5,6 @@ import ie.daithi.cards.web.exceptions.InvalidEmailException
 import ie.daithi.cards.web.exceptions.InvalidOperationException
 import ie.daithi.cards.web.exceptions.InvalidStatusException
 import ie.daithi.cards.web.exceptions.NotFoundException
-import ie.daithi.cards.web.exceptions.SendEmailException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -58,15 +57,6 @@ class ExceptionHandler {
                 message = ex.message!!,
                 status = HttpStatus.NOT_FOUND.value())
         return ResponseEntity(errorMessage, HttpStatus.NOT_FOUND)
-    }
-
-    @ExceptionHandler(SendEmailException::class)
-    fun generateSendEmailExceptionMessage(ex: SendEmailException): ResponseEntity<ErrorMessage> {
-        val errorMessage = ErrorMessage(timestamp = LocalDateTime.now(),
-                error = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
-                message = ex.message!!,
-                status = HttpStatus.INTERNAL_SERVER_ERROR.value())
-        return ResponseEntity(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
 }

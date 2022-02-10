@@ -88,10 +88,10 @@ class GameController (
 
     @PutMapping("/admin/game")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Create Game", notes = "Issues an email to all players with a link to allow them to access the game")
+    @ApiOperation(value = "Create Game", notes = "Creates a new game")
     @ApiResponses(
             ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 502, message = "An error occurred when attempting to send email")
+            ApiResponse(code = 502, message = "An error occurred when attempting to create new game")
     )
     @ResponseBody
     fun put(@RequestBody createGame: CreateGame): Game {
@@ -129,7 +129,7 @@ class GameController (
     @ApiOperation(value = "Deal round", notes = "Shuffles the deck and create a new round")
     @ApiResponses(
             ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 502, message = "An error occurred when attempting to send email")
+            ApiResponse(code = 502, message = "An error occurred when attempting to deal")
     )
     fun deal(@RequestParam gameId: String) {
         // 1. Get current user ID

@@ -1,6 +1,5 @@
 package ie.daithi.cards.config
 
-import com.sendgrid.SendGrid
 import ie.daithi.websockets.model.WsMessage
 import io.lettuce.core.RedisURI
 import org.springframework.beans.factory.annotation.Value
@@ -31,7 +30,6 @@ import org.springframework.data.redis.core.RedisTemplate
 @ComponentScan(basePackages = ["ie.daithi.cards"])
 @EnableSwagger2
 class AppConfig(
-        @Value("\${sendgrid.api.key}") private val sendgridApiKey: String,
         @Value("\${REDIS_URL}") private val redisUriString: String,
         @Value("\${REDIS_TLS_URL:#{null}}") private val redisTlsUriString: String?) {
 
@@ -69,11 +67,6 @@ class AppConfig(
                 "Whatever",
                 Contact("Daithi Hearn","https://github.com/daithihearn", "daithi.hearn@gmail.com"),
                 "", "", Collections.emptyList())
-    }
-
-    @Bean("emailClient")
-    fun emailClient(): SendGrid {
-        return SendGrid(sendgridApiKey)
     }
 
     @Bean

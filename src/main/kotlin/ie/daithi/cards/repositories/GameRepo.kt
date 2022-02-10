@@ -14,7 +14,7 @@ interface GameRepo: MongoRepository<Game, String> {
     fun findByAdminIdAndStatusOrStatus(id: String, active: GameStatus, finished: GameStatus): List<Game>
 
     @Query(value = "{'\$and': [{'\$or': [{'players._id': ?0},{'adminId': ?0}]},{'\$or': [ {'status': 'FINISHED'}, {'status': 'ACTIVE'}, {'status': 'COMPLETED'}]}]}",
-        fields="{completedRounds: 0, emailMessage: 0}")
+        fields="{completedRounds: 0}")
     fun getMyGames(userId: String): List<Game>
 
     @Query(value = "{}", fields = "{ 'completedRounds': 0 }")

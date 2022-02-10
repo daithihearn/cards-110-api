@@ -8,8 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class AppUser (
     @Id
     var id: String? = null,
-    @Indexed(unique = true)
-    val email: String,
     val name: String,
     var picture: String? = null,
     val pictureLocked: Boolean = false
