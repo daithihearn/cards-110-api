@@ -41,8 +41,10 @@ class AppUserService (
         } else
             AppUser(id = subject, name = name, email = email, picture = picture)
 
-        val cloudImage = cloudService.uploadImage(picture)
-        newUser.picture = cloudImage
+        if (newUser.picture != null && newUser.picture != "") {
+            val cloudImage = cloudService.uploadImage(newUser.picture!!)
+            newUser.picture = cloudImage
+        }
 
         appUserRepo.save(newUser)
         return newUser
