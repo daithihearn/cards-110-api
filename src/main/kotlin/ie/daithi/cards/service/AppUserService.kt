@@ -41,9 +41,13 @@ class AppUserService (
         } else
             AppUser(id = subject, name = name, email = email, picture = picture)
 
-        if (newUser.picture != null && newUser.picture != "") {
-            val cloudImage = cloudService.uploadImage(newUser.picture!!)
-            newUser.picture = cloudImage
+        try {
+            if (newUser.picture != null && newUser.picture != "") {
+                val cloudImage = cloudService.uploadImage(newUser.picture!!)
+                newUser.picture = cloudImage
+            }
+        } catch (err: Error) {
+            logger.error("Failed to upload image to cloud service. Skipping... ${err.message}")
         }
 
         appUserRepo.save(newUser)

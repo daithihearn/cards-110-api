@@ -13,9 +13,14 @@ class CloudinaryService(
         private val cloudinary: Cloudinary) : CloudService {
 
     override fun uploadImage(imageUri: String): String {
+        if (imageUri.contains("res.cloudinary.com")) {
+            logger.info("Skipping image upload as it is cloudinary URL $imageUri")
+            return imageUri
+        }
+
         val publicId = "cards/avatars/${DigestUtils.md5Hex(imageUri)}"
 
-        logger.info("Uploading new Avatar: $publicId")
+        logger.info("Uploading new Avatar: $imageUri ")
 
         // Can we check if it already exists here?
 
