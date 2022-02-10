@@ -66,6 +66,6 @@ class ProfileController(
         return appUserService.updateUser(subject = subject,
                 name = updateProfile.name,
                 email = updateProfile.email.trim().lowercase(),
-                picture = updateProfile.picture)
+                picture = updateProfile.picture ?: "")
     }
 }

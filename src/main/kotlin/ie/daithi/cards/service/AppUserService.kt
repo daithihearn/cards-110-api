@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class AppUserService (
-        private val appUserRepo: AppUserRepo
+        private val appUserRepo: AppUserRepo,
+        private val cloudService: CloudService
 ) {
 
     fun getUser(userId: String): AppUser {
@@ -29,15 +30,17 @@ class AppUserService (
         return appUserRepo.existsById(id)
     }
 
-    fun updateUser(subject: String, name: String, email: String, picture: String?): AppUser {
+    fun updateUser(subject: String, name: String, email: String, picture: String): AppUser {
         val existingUser = appUserRepo.findById(subject)
 
         val newUser = if (existingUser.isPresent) {
             val updatedUser = existingUser.get()
-            if (!existingUser.get().pictureLocked) updatedUser.picture = picture
+            if (!existingUser.get().pictureLocked && picture != "") updatedUser.picture = picture
             updatedUser
-        } else
-            AppUser(id = subject, name = name, email = email, picture = picture )
+        } else {
+            val cloudImage = cloudService.uploadImage(picture)
+            AppUser(id = subject, name = name, email = email, picture = cloudImage)
+        }
 
         appUserRepo.save(newUser)
         return newUser

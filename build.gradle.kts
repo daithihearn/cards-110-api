@@ -75,6 +75,7 @@ dependencies {
 	implementation("com.auth0:java-jwt:3.18.2")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
 	implementation("org.apache.commons:commons-text:1.9")
+	implementation("com.cloudinary:cloudinary-http44:1.30.0")
 
 	//Test
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
