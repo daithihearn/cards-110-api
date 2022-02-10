@@ -31,16 +31,18 @@ class AppUserService (
     }
 
     fun updateUser(subject: String, name: String, email: String, picture: String): AppUser {
+        if (logger.isDebugEnabled) logger.debug("Updating user profile for $subject")
         val existingUser = appUserRepo.findById(subject)
 
         val newUser = if (existingUser.isPresent) {
             val updatedUser = existingUser.get()
             if (!existingUser.get().pictureLocked && picture != "") updatedUser.picture = picture
             updatedUser
-        } else {
-            val cloudImage = cloudService.uploadImage(picture)
-            AppUser(id = subject, name = name, email = email, picture = cloudImage)
-        }
+        } else
+            AppUser(id = subject, name = name, email = email, picture = picture)
+
+        val cloudImage = cloudService.uploadImage(picture)
+        newUser.picture = cloudImage
 
         appUserRepo.save(newUser)
         return newUser
