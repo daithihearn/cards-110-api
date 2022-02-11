@@ -22,13 +22,12 @@ class CloudinaryService(
 
         logger.info("Uploading new Avatar: $publicId ")
 
-        // Can we check if it already exists here?
-
         val params = ObjectUtils.asMap(
                 "public_id", publicId,
                 "overwrite", true,
-                "resource_type", "image"
-        )
+                "resource_type", "image",
+                "format", "jpg")
+//                "transformation", "c_crop,g_scale,w_200")
 
         return cloudinary.uploader().upload(imageUri, params)["secure_url"] as String
     }
