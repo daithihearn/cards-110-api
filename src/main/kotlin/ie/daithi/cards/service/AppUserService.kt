@@ -35,17 +35,16 @@ class AppUserService (
         val existingUser = appUserRepo.findById(subject)
 
         val newUser = if (existingUser.isPresent) {
-            val updatedUser = existingUser.get()
-            if (forceUpdate || !updatedUser.pictureLocked) updatedUser.picture = picture
-            AppUser(id = updatedUser.id, name = updatedUser.name, picture = updatedUser.picture, pictureLocked = updatedUser.pictureLocked || forceUpdate)
+            val updatedPicture = if (forceUpdate || !existingUser.get().pictureLocked)
+                picture
+            else existingUser.get().picture
+            AppUser(id = existingUser.get().id, name = existingUser.get().name, picture = updatedPicture, pictureLocked = existingUser.get().pictureLocked || forceUpdate)
         } else
             AppUser(id = subject, name = name, picture = picture, pictureLocked = forceUpdate)
 
         try {
-            if (newUser.picture != null && newUser.picture != "") {
-                val cloudImage = cloudService.uploadImage(newUser.picture!!)
-                newUser.picture = cloudImage
-            }
+            val cloudImage = cloudService.uploadImage(newUser.picture!!)
+            newUser.picture = cloudImage
         } catch (err: Error) {
             logger.error("Failed to upload image to cloud service. Skipping... ${err.message}")
         }
