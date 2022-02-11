@@ -30,16 +30,16 @@ class AppUserService (
         return appUserRepo.existsById(id)
     }
 
-    fun updateUser(subject: String, name: String, picture: String): AppUser {
+    fun updateUser(subject: String, name: String, picture: String, forceUpdate: Boolean): AppUser {
         if (logger.isDebugEnabled) logger.debug("Updating user profile for $subject")
         val existingUser = appUserRepo.findById(subject)
 
         val newUser = if (existingUser.isPresent) {
             val updatedUser = existingUser.get()
-            if (!existingUser.get().pictureLocked && picture != "") updatedUser.picture = picture
-            updatedUser
+            if (forceUpdate || !updatedUser.pictureLocked) updatedUser.picture = picture
+            AppUser(id = updatedUser.id, name = updatedUser.name, picture = updatedUser.picture, pictureLocked = updatedUser.pictureLocked || forceUpdate)
         } else
-            AppUser(id = subject, name = name, picture = picture)
+            AppUser(id = subject, name = name, picture = picture, pictureLocked = forceUpdate)
 
         try {
             if (newUser.picture != null && newUser.picture != "") {

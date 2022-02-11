@@ -65,6 +65,7 @@ class ProfileController(
         // 2. Check if a record exists
         return appUserService.updateUser(subject = subject,
                 name = updateProfile.name,
-                picture = updateProfile.picture ?: "")
+                picture = updateProfile.picture ?: "",
+                forceUpdate = updateProfile.forceUpdate)
     }
 }
