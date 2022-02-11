@@ -20,7 +20,7 @@ class CloudinaryService(
 
         val publicId = "cards/avatars/${DigestUtils.md5Hex(imageUri)}"
 
-        logger.info("Uploading new Avatar: $imageUri ")
+        logger.info("Uploading new Avatar: $publicId ")
 
         // Can we check if it already exists here?
 
