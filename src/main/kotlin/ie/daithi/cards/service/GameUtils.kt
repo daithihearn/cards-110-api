@@ -182,7 +182,7 @@ class GameUtils(
         val goerScore = scores[goer.teamId] ?: 0
         if (goerScore >= goer.call) {
             logger.info("Team ${goer.teamId} made the contract of ${goer.call} with a score of $goerScore")
-            if (goer.call == 30) {
+            if (goer.call == 30 && game.players.size > 2) {
                 logger.info("Successful Jink called!!")
                 updatePlayersScore(game.players, goer.teamId, goerScore * 2)
             } else {
