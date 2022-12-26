@@ -49,8 +49,8 @@ dependencies {
 
 	// External Dependencies
 
-	implementation("org.bouncycastle:bcprov-jdk15on:1.69")
-	implementation("com.heroku.sdk:env-keystore:1.1.6")
+	implementation("org.bouncycastle:bcprov-jdk15on:1.70")
+	implementation("com.heroku.sdk:env-keystore:1.1.7")
 
 	// Kotlin dependencies
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
@@ -63,22 +63,22 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-redis:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
-	implementation("org.springframework.security:spring-security-oauth2-resource-server:5.5.1")
-	implementation("org.springframework.security:spring-security-oauth2-jose:5.5.1")
+	implementation("org.springframework.security:spring-security-oauth2-resource-server:5.7.3")
+	implementation("org.springframework.security:spring-security-oauth2-jose:5.7.3")
 
 	// Springfox
 	implementation("io.springfox:springfox-swagger2:$swaggerVersion")
 	implementation("io.springfox:springfox-swagger-ui:$swaggerVersion")
 
 	// Other
-	implementation("com.auth0:java-jwt:3.19.3")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
-	implementation("org.apache.commons:commons-text:1.9")
-	implementation("com.cloudinary:cloudinary-http44:1.30.0")
+	implementation("com.auth0:java-jwt:4.2.1")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
+	implementation("org.apache.commons:commons-text:1.10.0")
+	implementation("com.cloudinary:cloudinary-http44:1.33.0")
 
 	//Test
 	testImplementation("org.springframework.boot:spring-boot-starter-test:$springBootVersion")
-	testImplementation("io.mockk:mockk:1.12.1")
+	testImplementation("io.mockk:mockk:1.13.2")
 
 
 }
