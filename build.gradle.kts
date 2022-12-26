@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
 	val kotlinVersion = "1.6.10"
-	val springBootVersion = "2.6.2"
+	val springBootVersion = "2.7.7"
 	repositories {
 		mavenLocal()
 		mavenCentral()
@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    id("org.springframework.boot") version "2.6.2"
+    id("org.springframework.boot") version "2.7.7"
     id("maven-publish")
     id("org.jetbrains.kotlin.jvm") version "1.6.10"
 	kotlin("plugin.spring") version "1.6.10"
@@ -40,8 +40,8 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 description = "api"
 
-val springBootVersion: String = "2.6.3"
-val swaggerVersion: String = "2.9.2"
+val springBootVersion: String = "2.7.7"
+val swaggerVersion: String = "2.10.5"
 
 dependencies {
 
@@ -71,7 +71,7 @@ dependencies {
 	implementation("io.springfox:springfox-swagger-ui:$swaggerVersion")
 
 	// Other
-	implementation("com.auth0:java-jwt:3.18.2")
+	implementation("com.auth0:java-jwt:3.19.3")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
 	implementation("org.apache.commons:commons-text:1.9")
 	implementation("com.cloudinary:cloudinary-http44:1.30.0")
