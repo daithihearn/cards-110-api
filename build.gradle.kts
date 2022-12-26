@@ -41,7 +41,7 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 description = "api"
 
 val springBootVersion: String = "2.7.7"
-val swaggerVersion: String = "2.10.5"
+val swaggerVersion: String = "2.9.2"
 
 dependencies {
 
