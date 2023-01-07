@@ -17,12 +17,17 @@ jobs:
       - uses: actions/checkout@v3
       - name: Update Version
         run: echo "${{ github.ref_name }}" > .version
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: daithihearn/cards-110-api
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+          platforms: linux/amd64,linux/arm64/v8
           tags: "latest,${{ github.ref_name }}"
       - name: Create PR with version changes
         uses: peter-evans/create-pull-request@v4
