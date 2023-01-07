@@ -5,7 +5,12 @@ on:
     types: [published]
 
 jobs:
-  build:
+  publish:
+    name: Build and Publish docker image to dockerhub
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: read
     runs-on: ubuntu-latest
 
     steps:
