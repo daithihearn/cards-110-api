@@ -10,16 +10,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Read value from Properties-file
-        id: read_property
-        uses: christian-draeger/read-properties@1.1.0
-        with:
-          path: '.env'
-          properties: 'CARDS_API_VERSION'
+      - name: Update Version
+        run: echo "${{ github.ref_name }}" > .version
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: daithihearn/cards-110-api
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: "latest,${{ steps.read_property.outputs.CARDS_API_VERSION }}"
+          tags: "latest,${{ github.ref_name }}"
+      - name: Create PR with version changes
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: Update latest version (${{ github.ref_name }})
+          title: Update latest version (${{ github.ref_name }})
+          body: |
+            Update latest version (${{ github.ref_name }})
+          branch: update-version-${{ github.ref_name }}
+          base: main
+          add-paths: |
+            .version
+          labels: |
+            update
+          assignees: |
+            ${{ github.actor }}
