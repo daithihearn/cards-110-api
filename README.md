@@ -19,4 +19,4 @@ To build locally run `./gradlew clean build`
 To build the docker image run `docker build . -t cards110-api`
 
 # Running
-To run locally built docker image run `docker run -d -p 8080:8080 --name cards110-api cards110-api`
+To run locally built docker image run `docker run -d -p 8080:8080 --env-file .env --name cards110-api cards110-api`
