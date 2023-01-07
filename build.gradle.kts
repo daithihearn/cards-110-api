@@ -99,9 +99,9 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.getByName<BootJar>("bootJar") {
-	enabled = false
+	enabled = true
 }
 
 tasks.getByName<Jar>("jar") {
-	enabled = true
+	enabled = false
 }
