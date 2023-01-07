@@ -10,6 +10,7 @@ RUN ./gradlew
 COPY ./build.gradle.kts ./
 COPY ./settings.gradle ./
 COPY ./system.properties ./
+COPY ./.version ./
 COPY ./src ./src
 
 RUN ./gradlew build publishToMavenLocal
