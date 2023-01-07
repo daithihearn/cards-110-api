@@ -4,12 +4,12 @@ WORKDIR /opt/app
 
 COPY ./gradle ./gradle
 COPY ./gradlew ./
+
+RUN ./gradlew
+
 COPY ./build.gradle.kts ./
 COPY ./settings.gradle ./
 COPY ./system.properties ./
-
-RUN ./gradlew clean build || return 0
-
 COPY ./src ./src
 
 RUN ./gradlew build publishToMavenLocal
