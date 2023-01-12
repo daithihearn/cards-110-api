@@ -437,7 +437,7 @@ class GameService(
         game.players.forEach { player ->
             if (player.id == me.id) player.cards = player.cards.minus(myCard)
         }
-        currentHand.playedCards = currentHand.playedCards.plus(Pair(me.id, myCard))
+        currentHand.playedCards = currentHand.playedCards.plus(PlayedCard(me.id, myCard))
 
         var type = EventType.CARD_PLAYED
 
