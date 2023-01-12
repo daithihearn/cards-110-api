@@ -86,7 +86,7 @@ class GameUtils(
                 status = game.status,
                 round = game.currentRound,
                 maxCall = highestCaller?.call ?: 0,
-                playerProfiles = game.players.filter { p -> p.id != "dummy" }
+                players = game.players.filter { p -> p.id != "dummy" }
         )
     }
 
@@ -100,7 +100,7 @@ class GameUtils(
             iamDealer = false,
             status = game.status,
             round = game.currentRound,
-            playerProfiles = game.players.filter { p -> p.id != "dummy" }
+            players = game.players.filter { p -> p.id != "dummy" }
         )
     }
 
@@ -232,8 +232,8 @@ class GameUtils(
         val suit = round.suit ?: throw InvalidOperationException("No suit detected")
         var bestCard = Card.EMPTY
         round.completedHands.plus(round.currentHand).forEach { hand ->
-            hand.playedCards.forEach { card ->
-                if (isTrump(suit, card.value) && card.value.value > bestCard.value) bestCard = card.value
+            hand.playedCards.forEach { pc ->
+                if (isTrump(suit, pc.card) && pc.card.value > bestCard.value) bestCard = pc.card
             }
         }
         return bestCard
@@ -266,24 +266,24 @@ class GameUtils(
     fun handWinner(currentHand: Hand, suit: Suit, players: List<Player>): Pair<Player, Card> {
 
         // 1. Was a suit or wild card played? If not set the lead out card as the suit
-        val activeSuit  = if (currentHand.playedCards.filter { it.value.suit == suit || it.value.suit == Suit.WILD }.isEmpty())
+        val activeSuit  = if (currentHand.playedCards.filter { it.card.suit == suit || it.card.suit == Suit.WILD }.isEmpty())
             currentHand.leadOut!!.suit
         else suit
 
         logger.info("Active suit is: $activeSuit")
 
         // 2. Find winning card
-        val winningCard = if (activeSuit == suit) currentHand.playedCards.filter { it.value.suit == activeSuit || it.value.suit == Suit.WILD }.maxByOrNull { it.value.value }
-        else currentHand.playedCards.filter { it.value.suit == activeSuit }.maxByOrNull { it.value.coldValue }
+        val winningCard = if (activeSuit == suit) currentHand.playedCards.filter { it.card.suit == activeSuit || it.card.suit == Suit.WILD }.maxByOrNull { it.card.value }
+        else currentHand.playedCards.filter { it.card.suit == activeSuit }.maxByOrNull { it.card.coldValue }
         winningCard?: throw InvalidOperationException("Can't find the winning card")
 
         logger.info("Winning card is: $winningCard")
 
-        val winner = players.find { it.id == winningCard.key } ?: throw NotFoundException("Couldn't find winning player")
+        val winner = players.find { it.id == winningCard.playerId } ?: throw NotFoundException("Couldn't find winning player")
 
         logger.info("Winner is: $winner")
 
-        return Pair(winner, winningCard.value)
+        return Pair(winner, winningCard.card)
     }
 
     fun isFollowing(myCard: Card, myCards: List<Card>, currentHand: Hand, suit: Suit): Boolean {
