@@ -86,7 +86,7 @@ class GameUtils(
                 status = game.status,
                 round = game.currentRound,
                 maxCall = highestCaller?.call ?: 0,
-                playerProfiles = game.players.filter { p -> p.id != "dummy" }
+                players = game.players.filter { p -> p.id != "dummy" }
         )
     }
 
@@ -100,7 +100,7 @@ class GameUtils(
             iamDealer = false,
             status = game.status,
             round = game.currentRound,
-            playerProfiles = game.players.filter { p -> p.id != "dummy" }
+            players = game.players.filter { p -> p.id != "dummy" }
         )
     }
 

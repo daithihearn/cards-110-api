@@ -14,5 +14,5 @@ data class GameState(
         val status: GameStatus,
         val round: Round,
         val maxCall: Int? = null,
-        val playerProfiles: List<Player>
+        val players: List<Player>
 )
