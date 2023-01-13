@@ -145,6 +145,10 @@ class GameUtils(
             player.cards = emptyList()
         }
 
+
+        // 4. Set the status to DEALING
+        game.currentRound.status = RoundStatus.DEALING
+
         return game
     }
 
