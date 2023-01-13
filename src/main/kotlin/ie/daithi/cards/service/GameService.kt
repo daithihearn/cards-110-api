@@ -55,7 +55,7 @@ class GameService(
         val hand = Hand(timestamp = timestamp,
                 currentPlayerId = gameUtils.nextPlayer(players, dealerId).id)
 
-        val round = Round(timestamp = timestamp, number = 1, status = RoundStatus.CALLING, currentHand = hand, dealerId = dealerId)
+        val round = Round(timestamp = timestamp, number = 1, status = RoundStatus.DEALING, currentHand = hand, dealerId = dealerId)
 
         // 6. Create Game
         var game = Game(
@@ -191,10 +191,13 @@ class GameService(
         // 6. Reset bought cards
         game.players.forEach { player -> player.cardsBought = null }
 
-        // 7. Save the game
+        // 7. Set the game status
+        game.currentRound.status = RoundStatus.CALLING
+
+        // 8. Save the game
         save(game)
 
-        // 8. Publish updated game
+        // 9. Publish updated game
         gameUtils.publishGame(game = game, type = EventType.DEAL)
     }
 
@@ -489,7 +492,7 @@ class GameService(
     companion object {
         private val logger = LogManager.getLogger(GameService::class.java)
         private val VALID_CALL = listOf(0, 10, 15, 20, 25, 30)
-        private val BUNKER_SCORE = -30
+        private const val BUNKER_SCORE = -30
     }
 
 }
