@@ -123,29 +123,6 @@ class GameController (
         return gameService.delete(gameId)
     }
 
-
-    @PutMapping("/deal")
-    @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Deal round", notes = "Shuffles the deck and create a new round")
-    @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 502, message = "An error occurred when attempting to deal")
-    )
-    fun deal(@RequestParam gameId: String) {
-        // 1. Get current user ID
-        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
-        val user = appUserService.getUserBySubject(subject)
-
-        // 2. Get Game
-        val game = gameService.get(gameId)
-
-        // 3. Check the player is in this game
-        if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only deal if you are part of the game.")
-	
-	    // 4. Deal
-        gameService.deal(game, user.id!!)
-    }
-
     @PutMapping("/call")
     @ResponseStatus(value = HttpStatus.OK)
     @ApiOperation(value = "Make a call", notes = "After dealing each player can make a call between 0-30")
