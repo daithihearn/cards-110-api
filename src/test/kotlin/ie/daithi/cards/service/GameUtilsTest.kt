@@ -15,8 +15,9 @@ class GameUtilsTest {
 
     private val publishService: PublishService = mockk()
     private val spectatorService: SpectatorService = mockk()
+    private val deckService: DeckService = mockk()
 
-    private val gameUtils = GameUtils(publishService, spectatorService)
+    private val gameUtils = GameUtils(publishService, spectatorService, deckService)
 
     @Nested
     inner class CalculateScoresForRound {

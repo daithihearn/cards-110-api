@@ -55,10 +55,11 @@ class GameService(
         val hand = Hand(timestamp = timestamp,
                 currentPlayerId = gameUtils.nextPlayer(players, dealerId).id)
 
-        val round = Round(timestamp = timestamp, number = 1, status = RoundStatus.DEALING, currentHand = hand, dealerId = dealerId)
+        val round = Round(timestamp = timestamp, number = 1, status = RoundStatus.CALLING, currentHand = hand, dealerId = dealerId)
 
         // 6. Create Game
         var game = Game(
+                id = UUID.randomUUID().toString(),
                 timestamp = timestamp,
                 name = name,
                 status = GameStatus.ACTIVE,
@@ -66,6 +67,10 @@ class GameService(
                 players = players,
                 currentRound = round)
 
+        // 7. Deal Cards
+        gameUtils.dealCards(game)
+
+        // 8. Save the game
         game = save(game)
 
         logger.info("Game started successfully ${game.id}")
@@ -159,46 +164,6 @@ class GameService(
 
         // 7. Publish updated game
         gameUtils.publishGame(game = game, type = EventType.REPLAY)
-    }
-
-    @Transactional
-    // Deal a new round
-    fun deal(game: Game, playerId: String) {
-
-        // 1. Check if they are the dealer
-        val dealer = game.currentRound.dealerId
-        if (dealer != playerId)
-            throw InvalidOperationException("Player $playerId is not the dealer")
-
-        // 2. Check if can deal
-        if (game.players.first().cards.isNotEmpty())
-            throw InvalidOperationException("Cards have already been dealt")
-
-
-        // 3. Order the hands. Dummy second last, dealer last
-        game.players = gameUtils.orderPlayersAtStartOfGame(dealer, game.players)
-
-        // 4. Shuffle
-        deckService.shuffle(gameId = game.id!!)
-
-        // 5. Deal the cards
-        val deck =  deckService.getDeck(game.id)
-        for(x in 0 until 5) {
-            game.players.forEach { player -> player.cards = player.cards.plus(gameUtils.popFromDeck(deck)) }
-        }
-        deckService.save(deck)
-
-        // 6. Reset bought cards
-        game.players.forEach { player -> player.cardsBought = null }
-
-        // 7. Set the game status
-        game.currentRound.status = RoundStatus.CALLING
-
-        // 8. Save the game
-        save(game)
-
-        // 9. Publish updated game
-        gameUtils.publishGame(game = game, type = EventType.DEAL)
     }
 
     @Transactional

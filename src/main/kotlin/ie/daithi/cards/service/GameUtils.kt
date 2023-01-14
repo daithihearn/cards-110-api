@@ -18,7 +18,8 @@ import kotlin.jvm.Throws
 @Service
 class GameUtils(
     private val publishService: PublishService,
-    private val spectatorService: SpectatorService
+    private val spectatorService: SpectatorService,
+    private val deckService: DeckService
     ) {
 
     fun popFromDeck(deck: Deck): Card {
@@ -147,7 +148,36 @@ class GameUtils(
 
 
         // 4. Set the status to DEALING
-        game.currentRound.status = RoundStatus.DEALING
+        game.currentRound.status = RoundStatus.PLAYING
+
+        // 5. Deal the cards
+        dealCards(game)
+
+        return game
+    }
+
+    fun dealCards(game: Game): Game {
+
+        // 1. Clear cards
+        game.players.forEach { player ->
+            player.cards = emptyList()
+        }
+
+        // 2. Order the hands. Dummy second last, dealer last
+        game.players = orderPlayersAtStartOfGame(game.currentRound.dealerId, game.players)
+
+        // 3. Shuffle
+        deckService.shuffle(gameId = game.id!!)
+
+        // 4. Deal the cards
+        val deck =  deckService.getDeck(game.id)
+        for(x in 0 until 5) {
+            game.players.forEach { player -> player.cards = player.cards.plus(popFromDeck(deck)) }
+        }
+        deckService.save(deck)
+
+        // 5. Reset bought cards
+        game.players.forEach { player -> player.cardsBought = null }
 
         return game
     }
