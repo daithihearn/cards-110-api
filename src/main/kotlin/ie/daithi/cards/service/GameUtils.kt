@@ -92,6 +92,28 @@ class GameUtils(
         )
     }
 
+    fun autoplayLastHand(game: Game): Game {
+        // Play the last card for each player
+        game.players.forEach { player ->
+            if (player.cards.size != 1)
+                    throw Error(
+                            "Invalid game state detected. Player ${player.id} should have 1 card but has ${player.cards.size}."
+                    )
+
+            if (game.currentRound.currentHand.leadOut == null)
+                    game.currentRound.currentHand.leadOut = player.cards[0]
+
+            game.currentRound.currentHand.playedCards =
+                    game.currentRound.currentHand.playedCards.plus(
+                            PlayedCard(player.id, player.cards[0])
+                    )
+
+            player.cards = emptyList()
+        }
+
+        return game
+    }
+
     fun parseSpectatorGameState(game: Game): GameState {
         // 1. Return spectator's game state
         return GameState(

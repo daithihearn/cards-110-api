@@ -472,14 +472,17 @@ class GameService(
         } else {
             logger.info("All players have played a card")
 
-            // Publish the game. The frontend will need to wait a while to allow the users to view
-            // the cards
-            gameUtils.publishGame(game = game, type = EventType.LAST_CARD_PLAYED)
+            if (currentRound.completedHands.size == 3) {
+                logger.info(
+                        "All hands have been played in this round bar the final hand. We will auto play the final hand."
+                )
 
-            if (currentRound.completedHands.size >= 4) {
-                logger.info("All hands have been played in this round")
+                // Auto play final hand
+                gameUtils.completeHand(game)
+                gameUtils.autoplayLastHand(game)
 
                 // Calculate Scores
+                logger.info(game.currentRound)
                 gameUtils.applyScores(game)
 
                 // Check if game is over
@@ -496,11 +499,13 @@ class GameService(
                             gameUtils.completeRound(game)
                             EventType.ROUND_COMPLETED
                         }
-            } else {
+            } else if (currentRound.completedHands.size < 4) {
                 logger.info("Not all hands have been played in this round yet")
                 // Create next hand
                 gameUtils.completeHand(game)
                 type = EventType.HAND_COMPLETED
+            } else {
+                throw Error("Invalid number of rounds detected")
             }
         }
 
