@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 @Document(collection="games")
 data class Game (
         @Id
-        val id: String? = null,
+        val id: String,
         val timestamp: LocalDateTime,
         val name: String,
         var status: GameStatus,
-	val adminId: String,
+	    val adminId: String,
         var players: List<Player>,
         var currentRound: Round,
         var completedRounds: List<Round> = emptyList()
