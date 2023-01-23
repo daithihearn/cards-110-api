@@ -1,6 +1,7 @@
 package ie.daithi.cards.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import ie.daithi.cards.model.GameState
 import ie.daithi.cards.model.PublishContent
 import ie.daithi.websockets.model.WsMessage
 import ie.daithi.cards.web.model.enums.EventType
@@ -16,8 +17,8 @@ class PublishService(
     private val objectMapper: ObjectMapper,
     @Value("\${REDIS_TOPIC}") private val topic: String
 ) {
-    fun publishContent(recipients: List<String>, content: Any, contentType: EventType): PublishContent {
-        val contentWrapped = PublishContent(type = contentType, content = content)
+    fun publishContent(recipients: List<String>, gameState: GameState, contentType: EventType, transitionData: Any? = null): PublishContent {
+        val contentWrapped = PublishContent(type = contentType, gameState = gameState, transitionData = transitionData)
         publishContent(recipients, contentWrapped)
         return contentWrapped
     }
@@ -33,8 +34,8 @@ class PublishService(
         return content
     }
 
-    fun publishContent(recipient: String, content: Any, contentType: EventType): PublishContent {
-        return publishContent(listOf(recipient), content, contentType)
+    fun publishContent(recipient: String, gameState: GameState, contentType: EventType, transitionData: Any? = null): PublishContent {
+        return publishContent(listOf(recipient), gameState, contentType, transitionData)
     }
 
     companion object {

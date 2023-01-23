@@ -78,7 +78,7 @@ class GameUtils(
 
         // 4. Return player's game state
         return GameState(
-                id = game.id!!,
+                id = game.id,
                 me = player,
                 iamSpectator = false,
                 isMyGo = game.currentRound.currentHand.currentPlayerId == player.id,
@@ -117,7 +117,7 @@ class GameUtils(
     fun parseSpectatorGameState(game: Game): GameState {
         // 1. Return spectator's game state
         return GameState(
-                id = game.id!!,
+                id = game.id,
                 iamSpectator = true,
                 isMyGo = false,
                 iamGoer = false,
@@ -190,7 +190,7 @@ class GameUtils(
         game.players = orderPlayersAtStartOfGame(game.currentRound.dealerId, game.players)
 
         // 3. Shuffle
-        deckService.shuffle(gameId = game.id!!)
+        deckService.shuffle(gameId = game.id)
 
         // 4. Deal the cards
         val deck = deckService.getDeck(game.id)
@@ -456,48 +456,27 @@ class GameUtils(
         else if (cardsSelected > 5) throw InvalidOperationException("You can only choose 5 cards")
     }
 
-    fun publishBuyCardsEvent(game: Game, buyCardsEvent: BuyCardsEvent) {
-
-        // Publish for players
-        game.players.forEach { player ->
-            if (player.id != "dummy" && player.id != buyCardsEvent.playerId) {
-                publishService.publishContent(
-                        recipient = "${player.id}${game.id!!}",
-                        content = buyCardsEvent,
-                        contentType = EventType.BUY_CARDS_NOTIFICATION
-                )
-            }
-        }
-
-        // Publish for spectators
-        spectatorService.getSpectators(game.id!!).forEach { spectator ->
-            publishService.publishContent(
-                    recipient = "${spectator.id}${game.id}",
-                    content = buyCardsEvent,
-                    contentType = EventType.BUY_CARDS_NOTIFICATION
-            )
-        }
-    }
-
-    fun publishGame(game: Game, type: EventType) {
+    fun publishGame(game: Game, type: EventType, transitionData: Any? = null) {
 
         // Publish for players
         game.players.forEach { player ->
             if (player.id != "dummy") {
                 publishService.publishContent(
-                        recipient = "${player.id}${game.id!!}",
-                        content = parsePlayerGameState(player = player, game = game),
-                        contentType = type
+                        recipient = "${player.id}${game.id}",
+                        gameState = parsePlayerGameState(player = player, game = game),
+                        contentType = type,
+                        transitionData = transitionData
                 )
             }
         }
 
         // Publish for spectators
-        spectatorService.getSpectators(game.id!!).forEach { spectator ->
+        spectatorService.getSpectators(game.id).forEach { spectator ->
             publishService.publishContent(
                     recipient = "${spectator.id}${game.id}",
-                    content = parseSpectatorGameState(game = game),
-                    contentType = type
+                    gameState = parseSpectatorGameState(game = game),
+                    contentType = type,
+                    transitionData = transitionData
             )
         }
     }

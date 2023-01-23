@@ -141,7 +141,7 @@ class GameController (
         if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only call if you are part of the game.")
 	
 	    // 4. Call
-        gameService.call(gameId = game.id!!, playerId = user.id!!, call = call)
+        gameService.call(gameId = game.id, playerId = user.id!!, call = call)
     }
 
     @PutMapping("/buyCards")
@@ -163,7 +163,7 @@ class GameController (
         if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only buy cards if you are part of the game.")
 	
 	    // 4. Buy cards
-        gameService.buyCards(gameId = game.id!!, playerId = user.id!!, selectedCards = cards)
+        gameService.buyCards(gameId = game.id, playerId = user.id!!, selectedCards = cards)
     }
 
     @PutMapping("/chooseFromDummy")
@@ -184,7 +184,7 @@ class GameController (
         if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only choose from the dummy if you are part of the game.")
 	
 	    // 4. Choose from dummy
-        gameService.chooseFromDummy(gameId = game.id!!, playerId = user.id!!, selectedCards = cards, suit = suit)
+        gameService.chooseFromDummy(gameId = game.id, playerId = user.id!!, selectedCards = cards, suit = suit)
     }
 
     @PutMapping("/playCard")
@@ -205,7 +205,7 @@ class GameController (
         if (!game.players.map {player -> player.id }.contains(user.id!!)) throw ForbiddenException("Can only play card if you are part of the game.")
 	
 	    // 4. Play card
-        gameService.playCard(gameId = game.id!!, playerId = user.id!!, myCard = card)
+        gameService.playCard(gameId = game.id, playerId = user.id!!, myCard = card)
     }
 
     @PutMapping("/replay")

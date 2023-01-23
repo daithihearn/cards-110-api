@@ -191,6 +191,7 @@ class GameService(
         // 5. Create Game
         var game =
                 Game(
+                        id = UUID.randomUUID().toString(),
                         timestamp = timestamp,
                         name = currentGame.name,
                         status = GameStatus.ACTIVE,
@@ -419,10 +420,7 @@ class GameService(
         save(game)
 
         // 11. Publish updated game
-        gameUtils.publishGame(game = game, type = EventType.BUY_CARDS)
-
-        // 12. Publish buy cards event
-        gameUtils.publishBuyCardsEvent(game, BuyCardsEvent(playerId, 5 - selectedCards.size))
+        gameUtils.publishGame(game = game, type = EventType.BUY_CARDS, BuyCardsEvent(playerId, 5 - selectedCards.size))
     }
 
     @Transactional
@@ -463,6 +461,7 @@ class GameService(
         currentHand.playedCards = currentHand.playedCards.plus(PlayedCard(me.id, myCard))
 
         var type = EventType.CARD_PLAYED
+        var transitionData: Round? = null
 
         // 9. Check if current hand is finished
         if (currentHand.playedCards.size < game.players.size) {
@@ -477,12 +476,11 @@ class GameService(
                         "All hands have been played in this round bar the final hand. We will auto play the final hand."
                 )
 
-                // Auto play final hand
+                // Autoplay final hand
                 gameUtils.completeHand(game)
                 gameUtils.autoplayLastHand(game)
 
                 // Calculate Scores
-                logger.info(game.currentRound)
                 gameUtils.applyScores(game)
 
                 // Check if game is over
@@ -496,12 +494,14 @@ class GameService(
                             EventType.GAME_OVER
                         } else {
                             logger.info("Game isn't over yet. Starting a new round")
+                            transitionData = game.currentRound.copy()
                             gameUtils.completeRound(game)
                             EventType.ROUND_COMPLETED
                         }
             } else if (currentRound.completedHands.size < 4) {
                 logger.info("Not all hands have been played in this round yet")
                 // Create next hand
+                transitionData = game.currentRound.copy()
                 gameUtils.completeHand(game)
                 type = EventType.HAND_COMPLETED
             } else {
@@ -513,7 +513,7 @@ class GameService(
         save(game)
 
         // 11. Publish updated game
-        gameUtils.publishGame(game = game, type = type)
+        gameUtils.publishGame(game = game, type = type, transitionData = transitionData)
     }
 
     companion object {
