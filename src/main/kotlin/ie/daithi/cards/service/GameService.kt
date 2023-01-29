@@ -483,6 +483,9 @@ class GameService(
                 // Calculate Scores
                 gameUtils.applyScores(game)
 
+                // Set the transition state data
+                transitionData = game.currentRound.copy()
+
                 // Check if game is over
                 type =
                         if (gameUtils.isGameOver(game.players)) {
@@ -494,7 +497,6 @@ class GameService(
                             EventType.GAME_OVER
                         } else {
                             logger.info("Game isn't over yet. Starting a new round")
-                            transitionData = game.currentRound.copy()
                             gameUtils.completeRound(game)
                             EventType.ROUND_COMPLETED
                         }
