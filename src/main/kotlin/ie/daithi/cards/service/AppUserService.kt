@@ -5,6 +5,7 @@ import ie.daithi.cards.web.exceptions.NotFoundException
 import ie.daithi.cards.model.AppUser
 import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class AppUserService (
@@ -38,9 +39,11 @@ class AppUserService (
             val updatedPicture = if (forceUpdate || !existingUser.get().pictureLocked)
                 picture
             else existingUser.get().picture
-            AppUser(id = existingUser.get().id, name = existingUser.get().name, picture = updatedPicture, pictureLocked = existingUser.get().pictureLocked || forceUpdate)
+            AppUser(id = existingUser.get().id, name = existingUser.get().name, picture = updatedPicture,
+                pictureLocked = existingUser.get().pictureLocked || forceUpdate, lastAccess = LocalDateTime.now())
         } else
-            AppUser(id = subject, name = name, picture = picture, pictureLocked = forceUpdate)
+            AppUser(id = subject, name = name, picture = picture, pictureLocked = forceUpdate,
+                lastAccess = LocalDateTime.now())
 
         try {
             val cloudImage = cloudService.uploadImage(newUser.picture!!)
