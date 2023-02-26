@@ -34,4 +34,15 @@ class StatsController(
 
         return statsService.gameStatsForPlayer(user.id!!)
     }
+
+    @GetMapping("/admin/stats/gameStats")
+    @ResponseStatus(value = HttpStatus.OK)
+    @ApiOperation(value = "Game stats for given player player", notes = "Returns the game stats for the given player")
+    @ApiResponses(
+        ApiResponse(code = 200, message = "Request successful")
+    )
+    @ResponseBody
+    fun gameStatsForPlayer(@RequestParam playerId: String): List<PlayerGameStats> {
+        return statsService.gameStatsForPlayer(playerId)
+    }
 }
