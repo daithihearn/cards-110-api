@@ -1,9 +1,12 @@
-package ie.daithi.cards.service
+package ie.daithi.cards.utils
 
 import ie.daithi.cards.enumeration.Card
 import ie.daithi.cards.enumeration.RoundStatus
 import ie.daithi.cards.enumeration.Suit
 import ie.daithi.cards.model.*
+import ie.daithi.cards.service.DeckService
+import ie.daithi.cards.service.PublishService
+import ie.daithi.cards.service.SpectatorService
 import ie.daithi.cards.web.exceptions.GameNotOverException
 import ie.daithi.cards.web.exceptions.InvalidOperationException
 import ie.daithi.cards.web.exceptions.NotFoundException
@@ -17,9 +20,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class GameUtils(
-        private val publishService: PublishService,
-        private val spectatorService: SpectatorService,
-        private val deckService: DeckService
+    private val publishService: PublishService,
+    private val spectatorService: SpectatorService,
+    private val deckService: DeckService
 ) {
 
     fun popFromDeck(deck: Deck): Card {
@@ -273,8 +276,9 @@ class GameUtils(
         val scores: MutableMap<String, Int> = mutableMapOf()
         players.forEach { player -> scores[player.teamId] = player.score }
 
-        // 3. Go backwards through the rounds until there is a unique winner
-        if (checkIfUniqueWinner(scores)) return players.filter { player -> player.score >= 110 }
+        // 3. Go backwards through the round until there is a unique winner
+        if (checkIfUniqueWinner(scores)) return scores.filter { score -> score.value >= 110 }.keys.map { teamId -> players.filter { player -> player.teamId == teamId }.first() }
+            // return players.filter { player -> player.score >= 110 }
         round.completedHands.plus(round.currentHand).reversed().forEach { hand ->
             val winner = handWinner(hand, round.suit!!, players)
             val currentScore =
@@ -284,7 +288,7 @@ class GameUtils(
                             )
             scores[winner.first.teamId] =
                     if (winner.second == bestCard) currentScore - 10 else currentScore - 5
-            if (checkIfUniqueWinner(scores)) return players.filter { player -> player.score >= 110 }
+            if (checkIfUniqueWinner(scores)) return scores.filter { score -> score.value >= 110 }.keys.map { teamId -> players.filter { player -> player.teamId == teamId }.first() }
         }
         // This should never happen
         throw UnexpectedException(

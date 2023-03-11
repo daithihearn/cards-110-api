@@ -6,6 +6,7 @@ import ie.daithi.cards.enumeration.RoundStatus
 import ie.daithi.cards.enumeration.Suit
 import ie.daithi.cards.model.*
 import ie.daithi.cards.repositories.GameRepo
+import ie.daithi.cards.utils.GameUtils
 import ie.daithi.cards.web.exceptions.InvalidOperationException
 import ie.daithi.cards.web.exceptions.InvalidStatusException
 import ie.daithi.cards.web.exceptions.NotFoundException
@@ -18,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GameService(
-        private val gameRepo: GameRepo,
-        private val gameUtils: GameUtils,
-        private val deckService: DeckService
+    private val gameRepo: GameRepo,
+    private val gameUtils: GameUtils,
+    private val deckService: DeckService
 ) {
     @Transactional
     fun create(adminId: String, name: String, playerIds: List<String>): Game {

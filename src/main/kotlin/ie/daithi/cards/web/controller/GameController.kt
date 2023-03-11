@@ -8,7 +8,7 @@ import ie.daithi.cards.service.GameService
 import ie.daithi.cards.web.model.CreateGame
 import ie.daithi.cards.model.AppUser
 import ie.daithi.cards.model.GameState
-import ie.daithi.cards.service.GameUtils
+import ie.daithi.cards.utils.GameUtils
 import ie.daithi.cards.service.SpectatorService
 import ie.daithi.cards.web.exceptions.ForbiddenException
 import io.swagger.annotations.*
@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1")
 @Api(tags = ["Game"], description = "Endpoints that relate to CRUD operations on Games")
 class GameController (
-        private val gameService: GameService,
-        private val gameUtils: GameUtils,
-        private val appUserService: AppUserService,
-        private val spectatorService: SpectatorService
+    private val gameService: GameService,
+    private val gameUtils: GameUtils,
+    private val appUserService: AppUserService,
+    private val spectatorService: SpectatorService
 ){
 
 
