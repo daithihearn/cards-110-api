@@ -1,9 +1,12 @@
-package ie.daithi.cards.service
+package ie.daithi.cards.utils
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.*
 import ie.daithi.cards.model.Game
 import ie.daithi.cards.model.Player
+import ie.daithi.cards.service.DeckService
+import ie.daithi.cards.service.PublishService
+import ie.daithi.cards.service.SpectatorService
 import io.mockk.mockk
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -269,6 +272,32 @@ class GameUtilsTest {
             val result = gameUtils.isGameOver(players)
 
             assert(result)
+        }
+    }
+
+    @Nested
+    inner class FindWinners {
+
+        private val game2 = objectMapper.readValue(File("src/test/resources/game2.json"), Game::class.java)
+        private val game3 = objectMapper.readValue(File("src/test/resources/game3.json"), Game::class.java)
+        @Test
+        fun `find winners simple`() {
+            val result = gameUtils.findWinners(game2)
+
+            assert(result.size == 1)
+            assert(result[0].score == 115)
+            assert(result[0].id == "player2-id")
+            assert(result[0].teamId == "player2-id")
+        }
+
+        @Test
+        fun `find winners complex`() {
+            val result = gameUtils.findWinners(game3)
+
+            assert(result.size == 1)
+            assert(result[0].score == 110)
+            assert(result[0].id == "player2-id")
+            assert(result[0].teamId == "player2-id")
         }
     }
 }
