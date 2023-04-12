@@ -2,42 +2,44 @@ package ie.daithi.cards.web.security
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.core.OAuth2TokenValidator
 import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
-@EnableWebSecurity
-class WebSecurity(
+
+@Configuration
+class SecurityConfig(
         @Value("\${auth0.audience}")
         private val audience: String,
         @Value("\${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
         private val issuer: String,
         @Value("#{'\${cors.whitelist}'.split(',')}")
         private val allowedOrigins: List<String>
-): WebSecurityConfigurerAdapter() {
+) {
 
-    override fun configure(http: HttpSecurity) {
-        http.cors().and().authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/swagger-ui.html**").permitAll()
-                .antMatchers(HttpMethod.GET, "/webjars/springfox-swagger-ui/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/v2/api-docs").permitAll()
-                .antMatchers(HttpMethod.GET, "/healthcheck").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/**").hasAuthority("SCOPE_read:game")
-                .antMatchers(HttpMethod.PUT, "/api/v1/**").hasAuthority("SCOPE_write:game")
-                .antMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority("SCOPE_read:admin")
-                .antMatchers(HttpMethod.PUT, "/api/v1/admin/**").hasAuthority("SCOPE_write:admin")
-                .antMatchers(HttpMethod.DELETE, "/api/v1/admin/**").hasAuthority("SCOPE_delete:admin")
-                .anyRequest().authenticated()
-                .and()
-                .oauth2ResourceServer().jwt()
+    @Bean
+    @Throws(Exception::class)
+    fun filterChain(http: HttpSecurity): SecurityFilterChain? {
+        http.cors().and().authorizeHttpRequests()
+            .requestMatchers(HttpMethod.GET, "/swagger-ui/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api-docs/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/actuator/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/**").hasAuthority("SCOPE_read:game")
+            .requestMatchers(HttpMethod.PUT, "/api/v1/**").hasAuthority("SCOPE_write:game")
+            .requestMatchers(HttpMethod.GET, "/api/v1/admin/**").hasAuthority("SCOPE_read:admin")
+            .requestMatchers(HttpMethod.PUT, "/api/v1/admin/**").hasAuthority("SCOPE_write:admin")
+            .requestMatchers(HttpMethod.DELETE, "/api/v1/admin/**").hasAuthority("SCOPE_delete:admin")
+            .anyRequest().authenticated()
+            .and()
+            .oauth2ResourceServer().jwt()
+        return http.build()
     }
 
     @Bean

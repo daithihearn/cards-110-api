@@ -11,7 +11,10 @@ import ie.daithi.cards.model.GameState
 import ie.daithi.cards.utils.GameUtils
 import ie.daithi.cards.service.SpectatorService
 import ie.daithi.cards.web.exceptions.ForbiddenException
-import io.swagger.annotations.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.logging.log4j.LogManager
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
@@ -19,7 +22,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1")
-@Api(tags = ["Game"], description = "Endpoints that relate to CRUD operations on Games")
+@Tag(name = "Game", description = "Endpoints that relate to CRUD operations on Games")
 class GameController (
     private val gameService: GameService,
     private val gameUtils: GameUtils,
@@ -30,10 +33,10 @@ class GameController (
 
     @GetMapping("/game")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Get Game", notes = "Get the game")
+    @Operation(summary = "Get Game", description = "Get the game for the given gameId")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 404, message = "Game not found")
+            ApiResponse(responseCode = "200", description = "Request successful"),
+            ApiResponse(responseCode = "404", description = "Game not found")
     )
     @ResponseBody
     fun get(@RequestParam gameId: String): Game {
@@ -42,9 +45,9 @@ class GameController (
 
     @GetMapping("/game/all")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Get all games", notes = "Get all games")
+    @Operation(summary = "Get all games", description = "Get all games")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     @ResponseBody
     fun getAll(): List<Game> {
@@ -53,9 +56,9 @@ class GameController (
 
     @GetMapping("/admin/game/players/all")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Get ALL Players", notes = "Get all players")
+    @Operation(summary = "Get ALL Players", description = "Get all players")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     @ResponseBody
     fun getAllPlayers(): List<AppUser> {
@@ -65,10 +68,10 @@ class GameController (
 
     @GetMapping("/game/players")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Get Players", notes = "Get the players for this game")
+    @Operation(summary = "Get Players", description = "Get the players for this game")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 404, message = "Game not found")
+            ApiResponse(responseCode = "200", description = "Request successful"),
+            ApiResponse(responseCode = "404", description = "Game not found")
     )
     @ResponseBody
     fun getPlayersForGame(@RequestParam gameId: String): List<AppUser> {
@@ -88,10 +91,10 @@ class GameController (
 
     @PutMapping("/admin/game")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Create Game", notes = "Creates a new game")
+    @Operation(summary = "Create Game", description = "Creates a new game")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 502, message = "An error occurred when attempting to create new game")
+            ApiResponse(responseCode = "200", description = "Request successful"),
+            ApiResponse(responseCode = "502", description = "An error occurred when attempting to create new game")
     )
     @ResponseBody
     fun put(@RequestBody createGame: CreateGame): Game {
@@ -102,10 +105,10 @@ class GameController (
 
     @PutMapping("/admin/game/cancel")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Cancel a Game", notes = "Cancels the game")
+    @Operation(summary = "Cancel a Game", description = "Cancels the game")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 404, message = "Game not found")
+            ApiResponse(responseCode = "200", description = "Request successful"),
+            ApiResponse(responseCode = "404", description = "Game not found")
     )
     @ResponseBody
     fun cancel(@RequestParam gameId: String) {
@@ -114,10 +117,10 @@ class GameController (
 
     @DeleteMapping("/admin/game")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Delete Game", notes = "Delete the game")
+    @Operation(summary = "Delete Game", description = "Delete the game")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful"),
-            ApiResponse(code = 404, message = "Game not found")
+            ApiResponse(responseCode = "200", description = "Request successful"),
+            ApiResponse(responseCode = "404", description = "Game not found")
     )
     fun delete(@RequestParam gameId: String) {
         return gameService.delete(gameId)
@@ -125,9 +128,9 @@ class GameController (
 
     @PutMapping("/call")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Make a call", notes = "After dealing each player can make a call between 0-30")
+    @Operation(summary = "Make a call", description = "After dealing each player can make a call between 0-30")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     fun call(@RequestParam gameId: String, @RequestParam call: Int) {
         // 1. Get current user ID
@@ -146,9 +149,9 @@ class GameController (
 
     @PutMapping("/buyCards")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Buy Cards", notes = "Buy cards")
+    @Operation(summary = "Buy Cards", description = "Buy cards")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     // TODO: Might need a wrapper object here
     fun buyCards(@RequestParam gameId: String, @RequestBody cards: List<Card>) {
@@ -168,9 +171,9 @@ class GameController (
 
     @PutMapping("/chooseFromDummy")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Choose from the dummy", notes = "Choose cards from the dummy")
+    @Operation(summary = "Choose from the dummy", description = "Choose cards from the dummy")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     fun chooseFromDummy(@RequestParam gameId: String, @RequestParam suit: Suit, @RequestBody cards: List<Card>) {
         // 1. Get current user ID
@@ -189,9 +192,9 @@ class GameController (
 
     @PutMapping("/playCard")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Play a card", notes = "Play a card")
+    @Operation(summary = "Play a card", description = "Play a card")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     fun playCard(@RequestParam gameId: String, @RequestParam card: Card) {
         // 1. Get current user ID
@@ -210,9 +213,9 @@ class GameController (
 
     @PutMapping("/replay")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Replay the game", notes = "Replay the game")
+    @Operation(summary = "Replay the game", description = "Replay the game")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     fun replay(@RequestParam gameId: String) {
         // 1. Get current user ID
@@ -231,9 +234,9 @@ class GameController (
 
     @GetMapping("/gameState")
     @ResponseStatus(value = HttpStatus.OK)
-    @ApiOperation(value = "Get game", notes = "Get the game")
+    @Operation(summary = "Get game", description = "Get the game")
     @ApiResponses(
-            ApiResponse(code = 200, message = "Request successful")
+            ApiResponse(responseCode = "200", description = "Request successful")
     )
     @ResponseBody
     fun getGameState(@RequestParam gameId: String): GameState {
