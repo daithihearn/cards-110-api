@@ -39,7 +39,7 @@ repositories {
 version=File(".version").readText(Charsets.UTF_8)
 
 group = "ie.daithi.cards"
-java.sourceCompatibility = JavaVersion.VERSION_19
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 description = "api"
 

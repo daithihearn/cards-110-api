@@ -1,4 +1,4 @@
-FROM eclipse-temurin:19 AS builder
+FROM eclipse-temurin:17 AS builder
 
 WORKDIR /opt/app
 
@@ -15,7 +15,7 @@ COPY ./src ./src
 
 RUN ./gradlew build publishToMavenLocal
 
-FROM eclipse-temurin:19
+FROM eclipse-temurin:17
 
 WORKDIR /opt/app
 
