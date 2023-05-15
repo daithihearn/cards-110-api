@@ -66,7 +66,7 @@ dependencies {
 	implementation("org.springframework.security:spring-security-oauth2-jose:6.0.2")
 
 	// Springfox
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
 	// Other
 	implementation("com.auth0:java-jwt:4.3.0")
