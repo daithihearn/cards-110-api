@@ -14,7 +14,7 @@ import org.springframework.boot.runApplication
     info = Info(
         title =
         "Cards 110 API",
-        version = "6.1.1",
+        version = "6.2.0",
         description = "The API for the Cards 110 game"
     ),
     servers = [
