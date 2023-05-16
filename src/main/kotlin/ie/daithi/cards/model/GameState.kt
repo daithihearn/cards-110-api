@@ -10,6 +10,7 @@ data class GameState(
         val isMyGo: Boolean,
         val iamGoer: Boolean,
         val iamDealer: Boolean,
+        val iamAdmin: Boolean,
         val cards: List<Card>? = null,
         val status: GameStatus,
         val round: Round,

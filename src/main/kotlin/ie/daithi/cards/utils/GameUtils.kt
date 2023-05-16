@@ -87,6 +87,7 @@ class GameUtils(
                 isMyGo = game.currentRound.currentHand.currentPlayerId == player.id,
                 iamGoer = iamGoer,
                 iamDealer = game.currentRound.dealerId == player.id,
+                iamAdmin = game.adminId == player.id,
                 cards = player.cards,
                 status = game.status,
                 round = game.currentRound,
@@ -125,6 +126,7 @@ class GameUtils(
                 isMyGo = false,
                 iamGoer = false,
                 iamDealer = false,
+                iamAdmin = false,
                 status = game.status,
                 round = game.currentRound,
                 players = game.players.filter { p -> p.id != "dummy" }
