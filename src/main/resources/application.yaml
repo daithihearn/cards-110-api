@@ -1,4 +1,7 @@
-server: 
+app:
+  version: 6.3.0
+
+server:
   address: 0.0.0.0
   port: ${PORT}
   error.include-message: always
@@ -39,7 +42,7 @@ logging:
 
 springdoc:
   api-docs:
-    path: /api-docs
+    path: ${API_DOCS:/api-docs}
   swagger-ui:
     path: /
 
