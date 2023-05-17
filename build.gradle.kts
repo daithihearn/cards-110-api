@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
+import org.yaml.snakeyaml.Yaml
+import java.io.FileReader
 
 buildscript {
 	repositories {
@@ -9,6 +11,7 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin")
 		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.22")
+		classpath("org.yaml:snakeyaml:1.29")
 	}
 }
 
@@ -34,7 +37,9 @@ repositories {
 	}
 }
 
-version=File(".version").readText(Charsets.UTF_8)
+val yaml = Yaml()
+val obj: Map<String, Any> = yaml.load(FileReader("src/main/resources/application.yaml"))
+version = ((obj["app"] as Map<*, *>)["version"]).toString()
 
 group = "ie.daithi.cards"
 java.sourceCompatibility = JavaVersion.VERSION_17
