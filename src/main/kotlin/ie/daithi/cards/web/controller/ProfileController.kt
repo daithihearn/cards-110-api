@@ -62,7 +62,7 @@ class ProfileController(
         // 1. Get current user ID
         val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
 
-        // 2. Check if a record exists
+        // 2. Update the profile
         return appUserService.updateUser(subject = subject,
                 name = updateProfile.name,
                 picture = updateProfile.picture ?: "",
