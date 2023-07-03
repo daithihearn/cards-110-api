@@ -43,3 +43,5 @@ bin/
 
 # Deployment Script
 deploy.sh
+
+.env

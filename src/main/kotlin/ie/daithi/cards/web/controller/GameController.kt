@@ -75,17 +75,11 @@ class GameController (
     )
     @ResponseBody
     fun getPlayersForGame(@RequestParam gameId: String): List<AppUser> {
-        // 1. Get current user ID
-//        val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
-//        val user = appUserService.getUserBySubject(subject)
 
-        // 2. Get Game
+        // 1. Get Game
         val game = gameService.get(gameId)
 
-        // 3. Check the player is in this game
-//        if (!game.players.map {player -> player.id }.contains(user.id!!) && game.adminId != user.id!!) throw ForbiddenException("Can only get players if you are part of the game or are the admin.")
-
-        // 4. Get players
+        // 2. Get players
         return appUserService.getUsers(game.players.map { player -> player.id})
     }
 

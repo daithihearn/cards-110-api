@@ -60,13 +60,13 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib")
 
 	// Spring dependencies
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	implementation("org.springframework.boot:spring-boot-starter-websocket")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter:3.1.1")
+	implementation("org.springframework.boot:spring-boot-starter-web:3.1.1")
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.1.1")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis:3.1.1")
+	implementation("org.springframework.boot:spring-boot-starter-websocket:3.1.1")
+	implementation("org.springframework.boot:spring-boot-starter-security:3.1.1")
+	implementation("org.springframework.boot:spring-boot-starter-actuator:3.1.1")
 	implementation("org.springframework.security:spring-security-oauth2-resource-server:6.0.2")
 	implementation("org.springframework.security:spring-security-oauth2-jose:6.0.2")
 
@@ -80,7 +80,7 @@ dependencies {
 	implementation("com.cloudinary:cloudinary-http44:1.33.0")
 
 	//Test
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.1")
 	testImplementation("io.mockk:mockk:1.13.4")
 
 
