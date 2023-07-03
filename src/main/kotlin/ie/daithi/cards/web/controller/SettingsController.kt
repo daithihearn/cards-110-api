@@ -44,8 +44,8 @@ class SettingsController(
         // 1. Get current user ID
         val subject = SecurityContextHolder.getContext().authentication.name ?: throw ForbiddenException("Couldn't authenticate user")
 
-        // 2. Check that the player matches the settings object
-        if (subject != playerSettings.playerId) throw ForbiddenException("Player ID doesn't match")
+        // 2. Set the player ID as the subject
+        playerSettings.playerId = subject
 
         // 3. Update settings
         return settingsService.updateSettings(playerSettings)
