@@ -3,7 +3,7 @@ package ie.daithi.cards.enumeration
 enum class Card(val value: Int, val coldValue: Int, val suit: Suit, val renegable: Boolean) {
     EMPTY(0, 0, Suit.EMPTY, false),
     TWO_HEARTS(101, 2, Suit.HEARTS, false),
-    THREE_HEARTS(102,3, Suit.HEARTS, false),
+    THREE_HEARTS(102, 3, Suit.HEARTS, false),
     FOUR_HEARTS(103, 4, Suit.HEARTS, false),
     SIX_HEARTS(104, 6, Suit.HEARTS, false),
     SEVEN_HEARTS(105, 7, Suit.HEARTS, false),
@@ -54,5 +54,5 @@ enum class Card(val value: Int, val coldValue: Int, val suit: Suit, val renegabl
     ACE_SPADES(111, 10, Suit.SPADES, false),
     JACK_SPADES(114, 11, Suit.SPADES, true),
     FIVE_SPADES(115, 6, Suit.SPADES, true),
-    JOKER(113, 0, Suit.WILD, true);
+    JOKER(113, 0, Suit.WILD, true)
 }

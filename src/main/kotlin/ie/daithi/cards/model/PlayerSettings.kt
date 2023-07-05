@@ -6,8 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "playerSettings")
 data class PlayerSettings(
-    @Id
-    @JsonIgnore
-    var playerId: String? = null,
+    @Id @JsonIgnore var playerId: String? = null,
     var autoBuyCards: Boolean = false,
 )

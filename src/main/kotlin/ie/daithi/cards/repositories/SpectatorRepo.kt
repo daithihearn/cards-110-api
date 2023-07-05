@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface SpectatorRepo: CrudRepository<Spectator, String> {
+interface SpectatorRepo : CrudRepository<Spectator, String> {
     fun findAllByGameId(gameId: String): List<Spectator>
 }

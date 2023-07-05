@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile("prod")
-class CloudinaryService(
-        private val cloudinary: Cloudinary) : CloudService {
+class CloudinaryService(private val cloudinary: Cloudinary) : CloudService {
 
     override fun uploadImage(imageUri: String): String {
         if (imageUri.contains("res.cloudinary.com")) {
@@ -22,12 +21,18 @@ class CloudinaryService(
 
         logger.info("Uploading new Avatar: $publicId ")
 
-        val params = ObjectUtils.asMap(
-                "public_id", publicId,
-                "overwrite", true,
-                "resource_type", "image",
-                "format", "jpg")
-//                "transformation", "c_crop,g_scale,w_200")
+        val params =
+            ObjectUtils.asMap(
+                "public_id",
+                publicId,
+                "overwrite",
+                true,
+                "resource_type",
+                "image",
+                "format",
+                "jpg"
+            )
+        //                "transformation", "c_crop,g_scale,w_200")
 
         return cloudinary.uploader().upload(imageUri, params)["secure_url"] as String
     }
