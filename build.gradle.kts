@@ -18,9 +18,20 @@ buildscript {
 plugins {
 	id("org.springframework.boot") version "3.0.5"
     id("maven-publish")
+	id("com.diffplug.spotless") version "6.19.0"
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
 }
+
+spotless {
+	kotlin {
+		ktfmt().googleStyle().configure {
+			it.setBlockIndent(4)
+			it.setContinuationIndent(4)
+		}
+	}
+}
+
 
 apply(plugin = "maven-publish")
 apply(plugin = "io.spring.dependency-management")

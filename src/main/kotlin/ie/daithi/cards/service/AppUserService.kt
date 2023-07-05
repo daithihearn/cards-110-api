@@ -1,17 +1,14 @@
 package ie.daithi.cards.service
 
+import ie.daithi.cards.model.AppUser
 import ie.daithi.cards.repositories.AppUserRepo
 import ie.daithi.cards.web.exceptions.NotFoundException
-import ie.daithi.cards.model.AppUser
+import java.time.LocalDateTime
 import org.apache.logging.log4j.LogManager
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
-class AppUserService (
-        private val appUserRepo: AppUserRepo,
-        private val cloudService: CloudService
-) {
+class AppUserService(private val appUserRepo: AppUserRepo, private val cloudService: CloudService) {
 
     fun getUser(userId: String): AppUser {
         val appUser = appUserRepo.findById(userId)
@@ -35,15 +32,26 @@ class AppUserService (
         if (logger.isDebugEnabled) logger.debug("Updating user profile for $subject")
         val existingUser = appUserRepo.findById(subject)
 
-        val newUser = if (existingUser.isPresent) {
-            val updatedPicture = if (forceUpdate || !existingUser.get().pictureLocked)
-                picture
-            else existingUser.get().picture
-            AppUser(id = existingUser.get().id, name = existingUser.get().name, picture = updatedPicture,
-                pictureLocked = existingUser.get().pictureLocked || forceUpdate, lastAccess = LocalDateTime.now())
-        } else
-            AppUser(id = subject, name = name, picture = picture, pictureLocked = forceUpdate,
-                lastAccess = LocalDateTime.now())
+        val newUser =
+            if (existingUser.isPresent) {
+                val updatedPicture =
+                    if (forceUpdate || !existingUser.get().pictureLocked) picture
+                    else existingUser.get().picture
+                AppUser(
+                    id = existingUser.get().id,
+                    name = existingUser.get().name,
+                    picture = updatedPicture,
+                    pictureLocked = existingUser.get().pictureLocked || forceUpdate,
+                    lastAccess = LocalDateTime.now()
+                )
+            } else
+                AppUser(
+                    id = subject,
+                    name = name,
+                    picture = picture,
+                    pictureLocked = forceUpdate,
+                    lastAccess = LocalDateTime.now()
+                )
 
         try {
             val cloudImage = cloudService.uploadImage(newUser.picture!!)

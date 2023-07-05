@@ -6,6 +6,13 @@ import com.mongodb.MongoCredential
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.connection.SslSettings
+import java.io.File
+import java.io.StringReader
+import java.math.BigInteger
+import java.security.KeyStore
+import java.security.SecureRandom
+import javax.net.ssl.KeyManagerFactory
+import javax.net.ssl.SSLContext
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
@@ -25,33 +32,30 @@ import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
-import java.io.File
-import java.io.StringReader
-import java.math.BigInteger
-import java.security.KeyStore
-import java.security.SecureRandom
-import javax.net.ssl.KeyManagerFactory
-import javax.net.ssl.SSLContext
 
 @Configuration
 @EnableMongoRepositories(basePackages = ["ie.daithi.cards"])
 class MongoDbConfig(
-        @Value("\${spring.data.mongodb.uri}") private val mongoUri: String,
-        @Value("\${spring.data.mongodb.database}") private val mongoDbName: String,
-        @Value("#{'\${MONGODB_CLIENT_CERT}'}") private val clientCertificateEnv: String,
-        @Value("#{'\${MONGODB_CLIENT_CERT_KEY}'}") private val clientCertKeyEnv: String,
-        @Value("#{'\${MONGODB_CA_CERT}'}") private val mongoCaCerts: String,
-        @Value("#{'\${MONGODB_CLIENT_COMMON_NAME}'}") private val username: String,
-        @Value("\${server.ssl.trusted-certificates}") private val trustedCerts: String,
-        private val env: Environment
+    @Value("\${spring.data.mongodb.uri}") private val mongoUri: String,
+    @Value("\${spring.data.mongodb.database}") private val mongoDbName: String,
+    @Value("#{'\${MONGODB_CLIENT_CERT}'}") private val clientCertificateEnv: String,
+    @Value("#{'\${MONGODB_CLIENT_CERT_KEY}'}") private val clientCertKeyEnv: String,
+    @Value("#{'\${MONGODB_CA_CERT}'}") private val mongoCaCerts: String,
+    @Value("#{'\${MONGODB_CLIENT_COMMON_NAME}'}") private val username: String,
+    @Value("\${server.ssl.trusted-certificates}") private val trustedCerts: String,
+    private val env: Environment
 ) {
 
     @Bean
     fun mongoClient(): MongoClient {
         return when {
-            env.acceptsProfiles(Profiles.of("mongo-auth-x509")) -> MongoClients.create(this.getTlsSettings())
+            env.acceptsProfiles(Profiles.of("mongo-auth-x509")) ->
+                MongoClients.create(this.getTlsSettings())
             env.acceptsProfiles(Profiles.of("mongo-auth-password")) -> MongoClients.create(mongoUri)
-            else -> throw RuntimeException("A spring profile of either 'mongo-auth-x509' or 'mongo-auth-password' must be set")
+            else ->
+                throw RuntimeException(
+                    "A spring profile of either 'mongo-auth-x509' or 'mongo-auth-password' must be set"
+                )
         }
     }
 
@@ -72,7 +76,8 @@ class MongoDbConfig(
 
     @Bean("codecRegistry")
     fun codecRegistry(): CodecRegistry {
-        val pojoCodecRegistry: CodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build())
+        val pojoCodecRegistry: CodecRegistry =
+            fromProviders(PojoCodecProvider.builder().automatic(true).build())
         return fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry)
     }
 
@@ -84,34 +89,35 @@ class MongoDbConfig(
         val credential = MongoCredential.createMongoX509Credential(username)
 
         return MongoClientSettings.builder()
-                .applyConnectionString(ConnectionString(mongoUri))
-                .applyToSslSettings { builder: SslSettings.Builder -> builder.context(mongoSslContext) }
-                .credential(credential)
-                .build()
+            .applyConnectionString(ConnectionString(mongoUri))
+            .applyToSslSettings { builder: SslSettings.Builder -> builder.context(mongoSslContext) }
+            .credential(credential)
+            .build()
     }
 
     fun getMongoSslContext(): SSLContext {
 
-        //Create X509Certificate
+        // Create X509Certificate
         val certPemParser = PEMParser(StringReader(clientCertificateEnv))
         val certificateHolder = certPemParser.readObject() as X509CertificateHolder
         val certificate = JcaX509CertificateConverter().getCertificate(certificateHolder)
 
-        //Create client PrivateKey
+        // Create client PrivateKey
         val keyPemParser = PEMParser(StringReader(clientCertKeyEnv))
         val privateKeyInfo = keyPemParser.readObject() as PrivateKeyInfo
         val key = JcaPEMKeyConverter().getPrivateKey(privateKeyInfo)
 
-        //Generate random Password
+        // Generate random Password
         val password = BigInteger(130, SecureRandom()).toString(32)
 
-        //Create the KeyStore
+        // Create the KeyStore
         val keyStore = KeyStore.getInstance("JKS")
         keyStore.load(null)
         keyStore.setCertificateEntry("cardsUser-cert", certificate)
         keyStore.setKeyEntry("cardsUser-key", key, password.toCharArray(), arrayOf(certificate))
 
-        val keyManagerFactory: KeyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
+        val keyManagerFactory: KeyManagerFactory =
+            KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
         keyManagerFactory.init(keyStore, password.toCharArray())
 
         val sslContext = SSLContext.getInstance("TLSv1.2")

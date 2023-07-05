@@ -4,8 +4,8 @@ import ie.daithi.cards.enumeration.Card
 import java.time.LocalDateTime
 
 data class Hand(
-        val timestamp: LocalDateTime,
-        var leadOut: Card? = null,
-        var currentPlayerId: String,
-        var playedCards: List<PlayedCard> = emptyList()
+    val timestamp: LocalDateTime,
+    var leadOut: Card? = null,
+    var currentPlayerId: String,
+    var playedCards: List<PlayedCard> = emptyList()
 )

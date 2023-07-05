@@ -1,6 +1,6 @@
 package ie.daithi.cards.web.model
 
-data class UpdateProfile (
+data class UpdateProfile(
     val name: String,
     val picture: String? = null,
     val forceUpdate: Boolean = false

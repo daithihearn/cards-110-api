@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 @Profile("dev")
-class StubCloudService: CloudService {
+class StubCloudService : CloudService {
     override fun uploadImage(imageUri: String): String {
         logger.warn("Cloud service is not enabled")
         return imageUri

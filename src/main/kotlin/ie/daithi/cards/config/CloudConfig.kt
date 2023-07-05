@@ -8,10 +8,7 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("prod")
-class CloudConfig(
-        @Value("\${cloudinary.url}")
-        private val cloudinaryUrl: String
-) {
+class CloudConfig(@Value("\${cloudinary.url}") private val cloudinaryUrl: String) {
 
     @Bean("cloudinary")
     fun cloudinary(): Cloudinary {

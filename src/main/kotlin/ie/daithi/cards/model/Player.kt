@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import ie.daithi.cards.enumeration.Card
 
 data class Player(
-        val id: String,
-        val seatNumber: Int,
-        var call: Int = 0,
-        @JsonIgnore
-        var cards: List<Card> = emptyList(),
-        var cardsBought: Int? = null,
-        var score: Int = 0,
-        var rings: Int = 0,
-        val teamId: String,
-        var winner: Boolean = false
+    val id: String,
+    val seatNumber: Int,
+    var call: Int = 0,
+    @JsonIgnore var cards: List<Card> = emptyList(),
+    var cardsBought: Int? = null,
+    var score: Int = 0,
+    var rings: Int = 0,
+    val teamId: String,
+    var winner: Boolean = false
 )

@@ -8,9 +8,9 @@ import ie.daithi.cards.service.DeckService
 import ie.daithi.cards.service.PublishService
 import ie.daithi.cards.service.SpectatorService
 import io.mockk.mockk
+import java.io.File
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.io.File
 
 class GameUtilsTest {
 
@@ -25,13 +25,17 @@ class GameUtilsTest {
     @Nested
     inner class CalculateScoresForRound {
 
-        private val game = objectMapper.readValue(File("src/test/resources/game1.json"), Game::class.java)
+        private val game =
+            objectMapper.readValue(File("src/test/resources/game1.json"), Game::class.java)
 
         @Test
-        fun `round 1 test`()
-        {
+        fun `round 1 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[0], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[0],
+                    players = game.players
+                )
 
             assert(response["player1"] == 10)
             assert(response["player2"] == null)
@@ -40,10 +44,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 2 test`()
-        {
+        fun `round 2 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[1], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[1],
+                    players = game.players
+                )
 
             assert(response["player1"] == null)
             assert(response["player2"] == null)
@@ -52,10 +59,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 3 test`()
-        {
+        fun `round 3 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[2], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[2],
+                    players = game.players
+                )
 
             assert(response["player1"] == 15)
             assert(response["player2"] == 5)
@@ -64,10 +74,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 4 test`()
-        {
+        fun `round 4 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[3], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[3],
+                    players = game.players
+                )
 
             assert(response["player1"] == 15)
             assert(response["player2"] == null)
@@ -76,10 +89,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 5 test`()
-        {
+        fun `round 5 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[4], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[4],
+                    players = game.players
+                )
 
             assert(response["player1"] == 20)
             assert(response["player2"] == null)
@@ -88,10 +104,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 6 test`()
-        {
+        fun `round 6 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[5], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[5],
+                    players = game.players
+                )
 
             assert(response["player1"] == null)
             assert(response["player2"] == null)
@@ -100,10 +119,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 7 test`()
-        {
+        fun `round 7 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[6], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[6],
+                    players = game.players
+                )
 
             assert(response["player1"] == null)
             assert(response["player2"] == 25)
@@ -112,10 +134,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 8 test`()
-        {
+        fun `round 8 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[7], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[7],
+                    players = game.players
+                )
 
             assert(response["player1"] == null)
             assert(response["player2"] == 5)
@@ -124,10 +149,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 9 test`()
-        {
+        fun `round 9 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[8], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[8],
+                    players = game.players
+                )
 
             assert(response["player1"] == 10)
             assert(response["player2"] == 10)
@@ -136,10 +164,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 10 test`()
-        {
+        fun `round 10 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[9], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[9],
+                    players = game.players
+                )
 
             assert(response["player1"] == 10)
             assert(response["player2"] == 15)
@@ -148,10 +179,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 11 test`()
-        {
+        fun `round 11 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[10], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[10],
+                    players = game.players
+                )
 
             assert(response["player1"] == null)
             assert(response["player2"] == 30)
@@ -160,10 +194,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 12 test`()
-        {
+        fun `round 12 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[11], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[11],
+                    players = game.players
+                )
 
             assert(response["player1"] == 5)
             assert(response["player2"] == 5)
@@ -172,10 +209,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 13 test`()
-        {
+        fun `round 13 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[12], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[12],
+                    players = game.players
+                )
 
             assert(response["player1"] == null)
             assert(response["player2"] == null)
@@ -184,10 +224,13 @@ class GameUtilsTest {
         }
 
         @Test
-        fun `round 14 test`()
-        {
+        fun `round 14 test`() {
 
-            val response = gameUtils.calculateScoresForRound(round = game.completedRounds[13], players = game.players)
+            val response =
+                gameUtils.calculateScoresForRound(
+                    round = game.completedRounds[13],
+                    players = game.players
+                )
 
             assert(response["player1"] == null)
             assert(response["player2"] == 5)
@@ -200,14 +243,15 @@ class GameUtilsTest {
     inner class IsGameOver {
         @Test
         fun `all elements below 110`() {
-            val players = listOf(
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 100),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
-            )
+            val players =
+                listOf(
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 100),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+                )
             val result = gameUtils.isGameOver(players)
 
             assert(!result)
@@ -215,14 +259,15 @@ class GameUtilsTest {
 
         @Test
         fun `one element equals 110`() {
-            val players = listOf(
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
-            )
+            val players =
+                listOf(
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+                )
             val result = gameUtils.isGameOver(players)
 
             assert(result)
@@ -230,30 +275,31 @@ class GameUtilsTest {
 
         @Test
         fun `one element above 110`() {
-            val players = listOf(
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 120),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
-            )
+            val players =
+                listOf(
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 120),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 105),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+                )
             val result = gameUtils.isGameOver(players)
 
             assert(result)
         }
 
-
         @Test
         fun `multiple element equals 110`() {
-            val players = listOf(
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
-            )
+            val players =
+                listOf(
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 110),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+                )
             val result = gameUtils.isGameOver(players)
 
             assert(result)
@@ -261,14 +307,15 @@ class GameUtilsTest {
 
         @Test
         fun `multiple element above 110`() {
-            val players = listOf(
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 120),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 115),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
-                Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
-            )
+            val players =
+                listOf(
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 10),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 120),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 115),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 90),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 50),
+                    Player(id = "1", seatNumber = 0, teamId = "1", score = 40)
+                )
             val result = gameUtils.isGameOver(players)
 
             assert(result)
@@ -278,8 +325,11 @@ class GameUtilsTest {
     @Nested
     inner class FindWinners {
 
-        private val game2 = objectMapper.readValue(File("src/test/resources/game2.json"), Game::class.java)
-        private val game3 = objectMapper.readValue(File("src/test/resources/game3.json"), Game::class.java)
+        private val game2 =
+            objectMapper.readValue(File("src/test/resources/game2.json"), Game::class.java)
+        private val game3 =
+            objectMapper.readValue(File("src/test/resources/game3.json"), Game::class.java)
+
         @Test
         fun `find winners simple`() {
             val result = gameUtils.findWinners(game2)

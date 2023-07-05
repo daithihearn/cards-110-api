@@ -38,11 +38,11 @@ class GameService(
         // If we have six players we will assume this is a team game
         if (playerIdsShuffled.size == 6) {
             val teamIds =
-                    listOf(
-                            UUID.randomUUID().toString(),
-                            UUID.randomUUID().toString(),
-                            UUID.randomUUID().toString()
-                    )
+                listOf(
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString()
+                )
 
             players.add(Player(id = playerIdsShuffled[0], seatNumber = 1, teamId = teamIds[0]))
             players.add(Player(id = playerIdsShuffled[1], seatNumber = 2, teamId = teamIds[1]))
@@ -60,31 +60,31 @@ class GameService(
         val timestamp = LocalDateTime.now()
         val dealerId = players[0].id
         val hand =
-                Hand(
-                        timestamp = timestamp,
-                        currentPlayerId = gameUtils.nextPlayer(players, dealerId).id
-                )
+            Hand(
+                timestamp = timestamp,
+                currentPlayerId = gameUtils.nextPlayer(players, dealerId).id
+            )
 
         val round =
-                Round(
-                        timestamp = timestamp,
-                        number = 1,
-                        status = RoundStatus.CALLING,
-                        currentHand = hand,
-                        dealerId = dealerId
-                )
+            Round(
+                timestamp = timestamp,
+                number = 1,
+                status = RoundStatus.CALLING,
+                currentHand = hand,
+                dealerId = dealerId
+            )
 
         // 6. Create Game
         var game =
-                Game(
-                        id = UUID.randomUUID().toString(),
-                        timestamp = timestamp,
-                        name = name,
-                        status = GameStatus.ACTIVE,
-                        adminId = adminId,
-                        players = players,
-                        currentRound = round
-                )
+            Game(
+                id = UUID.randomUUID().toString(),
+                timestamp = timestamp,
+                name = name,
+                status = GameStatus.ACTIVE,
+                adminId = adminId,
+                players = players,
+                currentRound = round
+            )
 
         // 7. Deal Cards
         gameUtils.dealCards(game)
@@ -120,9 +120,9 @@ class GameService(
 
     fun getActiveForAdmin(adminId: String): List<Game> {
         return gameRepo.findByAdminIdAndStatusOrStatus(
-                adminId,
-                GameStatus.ACTIVE,
-                GameStatus.FINISHED
+            adminId,
+            GameStatus.ACTIVE,
+            GameStatus.FINISHED
         )
     }
 
@@ -130,7 +130,7 @@ class GameService(
     fun cancel(id: String) {
         val game = get(id)
         if (game.status == GameStatus.CANCELLED)
-                throw InvalidStatusException("Game is already in CANCELLED state")
+            throw InvalidStatusException("Game is already in CANCELLED state")
         game.status = GameStatus.CANCELLED
         save(game)
     }
@@ -143,7 +143,7 @@ class GameService(
         // 1. Check if they are the dealer
         val dealer = currentGame.currentRound.dealerId
         if (dealer != playerId)
-                throw InvalidOperationException("Player $playerId is not the dealer")
+            throw InvalidOperationException("Player $playerId is not the dealer")
 
         // 2. Set current game as completed
         currentGame.status = GameStatus.COMPLETED
@@ -155,14 +155,14 @@ class GameService(
         // If we have six players we will assume this is a team game
         if (oldPlayers.size == 6) {
             val teamIds =
-                    listOf(
-                            UUID.randomUUID().toString(),
-                            UUID.randomUUID().toString(),
-                            UUID.randomUUID().toString()
-                    )
+                listOf(
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString(),
+                    UUID.randomUUID().toString()
+                )
             oldPlayers.forEachIndexed { index, player ->
                 players.add(
-                        Player(id = player.id, seatNumber = index + 1, teamId = teamIds[3 % index])
+                    Player(id = player.id, seatNumber = index + 1, teamId = teamIds[3 % index])
                 )
             }
         } else {
@@ -175,31 +175,31 @@ class GameService(
         // 4. Create the first round and assign a dealer
         val dealerId = players[0].id
         val hand =
-                Hand(
-                        timestamp = timestamp,
-                        currentPlayerId = gameUtils.nextPlayer(players, dealerId).id
-                )
+            Hand(
+                timestamp = timestamp,
+                currentPlayerId = gameUtils.nextPlayer(players, dealerId).id
+            )
 
         val round =
-                Round(
-                        timestamp = timestamp,
-                        number = 1,
-                        status = RoundStatus.CALLING,
-                        currentHand = hand,
-                        dealerId = dealerId
-                )
+            Round(
+                timestamp = timestamp,
+                number = 1,
+                status = RoundStatus.CALLING,
+                currentHand = hand,
+                dealerId = dealerId
+            )
 
         // 5. Create Game
         var game =
-                Game(
-                        id = UUID.randomUUID().toString(),
-                        timestamp = timestamp,
-                        name = currentGame.name,
-                        status = GameStatus.ACTIVE,
-                        adminId = currentGame.adminId,
-                        players = players,
-                        currentRound = round
-                )
+            Game(
+                id = UUID.randomUUID().toString(),
+                timestamp = timestamp,
+                name = currentGame.name,
+                status = GameStatus.ACTIVE,
+                adminId = currentGame.adminId,
+                players = players,
+                currentRound = round
+            )
 
         // 6. Save the game
         game = save(game)
@@ -212,7 +212,7 @@ class GameService(
     fun call(gameId: String, playerId: String, call: Int) {
         // 1. Validate call value
         if (!VALID_CALL.contains(call))
-                throw InvalidOperationException("Call value $call is invalid")
+            throw InvalidOperationException("Call value $call is invalid")
 
         // 2. Get Game
         val game = get(gameId)
@@ -220,7 +220,7 @@ class GameService(
         // 3. Get current round
         val currentRound = game.currentRound
         if (currentRound.status != RoundStatus.CALLING)
-                throw InvalidOperationException("Can only call in the calling phase")
+            throw InvalidOperationException("Can only call in the calling phase")
 
         // 4. Get current hand
         val currentHand = currentRound.currentHand
@@ -230,20 +230,20 @@ class GameService(
 
         // 6. Check they are the next player
         if (currentHand.currentPlayerId != playerId)
-                throw InvalidOperationException("It's not your go!")
+            throw InvalidOperationException("It's not your go!")
 
         // 7. Are they in the bunker? If they are on -30 or less then they can only call 0
         if (me.score < BUNKER_SCORE && call != 0)
-                throw InvalidOperationException("You are in the bunker!")
+            throw InvalidOperationException("You are in the bunker!")
 
         // 8. Check if call value is valid i.e. > all other calls
         if (currentRound.dealerSeeingCall) {
             me.call = call
         } else if (call != 0) {
             val currentCaller =
-                    game.players.maxByOrNull { it.call } ?: throw Exception("Can't find caller")
+                game.players.maxByOrNull { it.call } ?: throw Exception("Can't find caller")
             if (currentHand.currentPlayerId == currentRound.dealerId && call >= currentCaller.call)
-                    me.call = call
+                me.call = call
             else if (call > currentCaller.call) me.call = call
             else throw InvalidOperationException("Call must be higher than ${currentCaller.call}")
         }
@@ -270,8 +270,7 @@ class GameService(
             logger.info("Everyone has called")
 
             val caller =
-                    game.players.maxByOrNull { it.call }
-                            ?: throw Exception("This should never happen")
+                game.players.maxByOrNull { it.call } ?: throw Exception("This should never happen")
 
             if (caller.call == 0 && me.call == 0) {
                 logger.info("Nobody called anything. Will have to re-deal.")
@@ -300,8 +299,8 @@ class GameService(
                 currentHand.currentPlayerId = currentRound.dealerId
             } else {
                 val caller =
-                        game.players.maxByOrNull { it.call }
-                                ?: throw Exception("This should never happen")
+                    game.players.maxByOrNull { it.call }
+                        ?: throw Exception("This should never happen")
                 if (caller.id != me.id) throw InvalidOperationException("Invalid call")
                 logger.info("${me.id} has raised the call")
                 currentHand.currentPlayerId = currentRound.dealerId
@@ -330,16 +329,14 @@ class GameService(
         // 3. Get Round
         val currentRound = game.currentRound
         if (currentRound.status != RoundStatus.CALLED)
-                throw InvalidOperationException("Can only call in the called phase")
+            throw InvalidOperationException("Can only call in the called phase")
 
         // 4. Get current hand
         val currentHand = currentRound.currentHand
 
         // 5. Validate player
         if (currentRound.goerId != playerId || currentHand.currentPlayerId != playerId)
-                throw InvalidOperationException(
-                        "Player ($playerId) is not the goer and current player"
-                )
+            throw InvalidOperationException("Player ($playerId) is not the goer and current player")
 
         // 6. Get myself
         val me = gameUtils.findPlayer(game.players, currentHand.currentPlayerId)
@@ -351,7 +348,7 @@ class GameService(
         // 8. Validate selected cards
         selectedCards.forEach {
             if (!(me.cards.contains(it) || dummy.cards.contains(it)))
-                    throw InvalidOperationException("You can't select this card: $it")
+                throw InvalidOperationException("You can't select this card: $it")
         }
 
         // 9. Set new hand and remove the dummy
@@ -379,14 +376,14 @@ class GameService(
         // 3. Get Round
         val currentRound = game.currentRound
         if (currentRound.status != RoundStatus.BUYING)
-                throw InvalidOperationException("Can only call in the buying phase")
+            throw InvalidOperationException("Can only call in the buying phase")
 
         // 4. Get current hand
         val currentHand = currentRound.currentHand
 
         // 5. Validate player
         if (currentHand.currentPlayerId != playerId)
-                throw InvalidOperationException("Player ($playerId) is not the current player")
+            throw InvalidOperationException("Player ($playerId) is not the current player")
 
         // 6. Get myself
         val me = gameUtils.findPlayer(game.players, currentHand.currentPlayerId)
@@ -394,14 +391,14 @@ class GameService(
         // 7. Validate selected cards
         selectedCards.forEach {
             if (!(me.cards.contains(it)))
-                    throw InvalidOperationException("You can't select this card: $it")
+                throw InvalidOperationException("You can't select this card: $it")
         }
 
         // 8. Get new cards
         val deck = deckService.getDeck(gameId)
         var newCards = selectedCards
         for (x in 0 until 5 - selectedCards.size) newCards =
-                newCards.plus(gameUtils.popFromDeck(deck))
+            newCards.plus(gameUtils.popFromDeck(deck))
         game.players.forEach { player ->
             if (player.id == playerId) {
                 player.cards = newCards
@@ -412,16 +409,20 @@ class GameService(
 
         // 9. Set next player
         currentHand.currentPlayerId =
-                if (currentRound.dealerId == playerId) {
-                    currentRound.status = RoundStatus.PLAYING
-                    gameUtils.nextPlayer(game.players, currentRound.goerId!!).id
-                } else gameUtils.nextPlayer(game.players, me.id).id
+            if (currentRound.dealerId == playerId) {
+                currentRound.status = RoundStatus.PLAYING
+                gameUtils.nextPlayer(game.players, currentRound.goerId!!).id
+            } else gameUtils.nextPlayer(game.players, me.id).id
 
         // 10. Save game
         save(game)
 
         // 11. Publish updated game
-        gameUtils.publishGame(game = game, type = EventType.BUY_CARDS, BuyCardsEvent(playerId, 5 - selectedCards.size))
+        gameUtils.publishGame(
+            game = game,
+            type = EventType.BUY_CARDS,
+            BuyCardsEvent(playerId, 5 - selectedCards.size)
+        )
     }
 
     @Transactional
@@ -432,7 +433,7 @@ class GameService(
         // 2. Get Round
         val currentRound = game.currentRound
         if (currentRound.status != RoundStatus.PLAYING)
-                throw InvalidOperationException("Can only call in the playing phase")
+            throw InvalidOperationException("Can only call in the playing phase")
 
         // 3. Get current hand
         val currentHand = currentRound.currentHand
@@ -440,7 +441,7 @@ class GameService(
 
         // 4. Validate player
         if (currentHand.currentPlayerId != playerId)
-                throw InvalidOperationException("Player ($playerId) is not the current player")
+            throw InvalidOperationException("Player ($playerId) is not the current player")
 
         // 5. Get myself
         val me = gameUtils.findPlayer(game.players, currentHand.currentPlayerId)
@@ -448,12 +449,12 @@ class GameService(
         // 6. Validate selected card
         if (me.cards.isEmpty()) throw InvalidOperationException("You have no cards left")
         if (!(me.cards.contains(myCard)))
-                throw InvalidOperationException("You can't select this card: $myCard")
+            throw InvalidOperationException("You can't select this card: $myCard")
 
         // 7. Check that they are following suit
         if (currentHand.leadOut == null) currentHand.leadOut = myCard
         else if (!gameUtils.isFollowing(myCard, me.cards, currentHand, suit))
-                throw InvalidOperationException("Must follow suit!")
+            throw InvalidOperationException("Must follow suit!")
 
         // 8. Play the card
         game.players.forEach { player ->
@@ -468,13 +469,13 @@ class GameService(
         if (currentHand.playedCards.size < game.players.size) {
             logger.info("Not all players have played a card yet")
             currentHand.currentPlayerId =
-                    gameUtils.nextPlayer(game.players, currentHand.currentPlayerId).id
+                gameUtils.nextPlayer(game.players, currentHand.currentPlayerId).id
         } else {
             logger.info("All players have played a card")
 
             if (currentRound.completedHands.size == 3) {
                 logger.info(
-                        "All hands have been played in this round bar the final hand. We will auto play the final hand."
+                    "All hands have been played in this round bar the final hand. We will auto play the final hand."
                 )
 
                 // Autoplay final hand
@@ -489,18 +490,18 @@ class GameService(
 
                 // Check if game is over
                 type =
-                        if (gameUtils.isGameOver(game.players)) {
-                            logger.info("Game is over.")
+                    if (gameUtils.isGameOver(game.players)) {
+                        logger.info("Game is over.")
 
-                            gameUtils.applyWinners(game)
+                        gameUtils.applyWinners(game)
 
-                            game.status = GameStatus.FINISHED
-                            EventType.GAME_OVER
-                        } else {
-                            logger.info("Game isn't over yet. Starting a new round")
-                            gameUtils.completeRound(game)
-                            EventType.ROUND_COMPLETED
-                        }
+                        game.status = GameStatus.FINISHED
+                        EventType.GAME_OVER
+                    } else {
+                        logger.info("Game isn't over yet. Starting a new round")
+                        gameUtils.completeRound(game)
+                        EventType.ROUND_COMPLETED
+                    }
             } else if (currentRound.completedHands.size < 4) {
                 logger.info("Not all hands have been played in this round yet")
                 // Create next hand

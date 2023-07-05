@@ -5,9 +5,7 @@ import ie.daithi.cards.repositories.SettingsRepo
 import org.springframework.stereotype.Service
 
 @Service
-class SettingsService(
-    private val settingsRepo: SettingsRepo
-) {
+class SettingsService(private val settingsRepo: SettingsRepo) {
     fun getSettings(playerId: String): PlayerSettings {
         val settings = settingsRepo.findById(playerId)
         if (settings.isPresent) {
@@ -19,5 +17,4 @@ class SettingsService(
     }
 
     fun updateSettings(playerSettings: PlayerSettings) = settingsRepo.save(playerSettings)
-
 }
