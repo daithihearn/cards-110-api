@@ -13,20 +13,10 @@ class DeckService(private val deckRepo: DeckRepo) {
 
     // Shuffle the deck for a game
     fun shuffle(gameId: String) {
-
         val deckList = Card.values().toList().shuffled(SecureRandom())
         val deck = Stack<Card>()
         deck.addAll(deckList.filter { card -> card != Card.EMPTY })
         deckRepo.save(Deck(id = gameId, cards = deck))
-    }
-
-    // Get the next card
-    fun nextCard(gameId: String): Card {
-        val deck = getDeck(gameId)
-        if (deck.cards.empty()) throw NotFoundException("No cards left")
-        val card = deck.cards.pop()
-        deckRepo.save(deck)
-        return card
     }
 
     fun save(deck: Deck) {
